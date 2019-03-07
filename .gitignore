@@ -3,3 +3,6 @@
 ################################################################################
 
 /.vs/AlphaSoul/v15
+/AlphaSoul/bin/Debug
+/AlphaSoul/obj/Debug
+/AlphaSoul/Properties
