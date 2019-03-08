@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace AlphaSoul
 {
-    // 发给玩家的 摸牌
+    /// <summary>
+    /// 发给玩家的 摸牌
+    /// </summary>
     class MopaiMessage
     {
         public Pai mopai;
@@ -28,6 +30,9 @@ namespace AlphaSoul
         }
     }
 
+    /// <summary>
+    /// 发送给玩家流局消息
+    /// </summary>
     class LiujuMessage
     {
         // 流局理由 "九种" "四风" "四杠" "荒牌"
@@ -55,50 +60,9 @@ namespace AlphaSoul
         }
     }
 
-
-    // 玩家切牌
-    class QiepaiMessage
-    {
-        // 切出的牌
-        public Pai qiepai;
-        public int from;
-
-        public QiepaiMessage(Pai a, int b)
-        {
-            qiepai = a;
-            from = b;
-        }
-    }
-
-    //玩家胡牌
-    class HuMessage
-    {
-        public Pai rongpai;
-        public int from;
-        //public PtResult res;
-
-        public HuMessage(Pai p, int id)
-        {
-            rongpai = p;
-            from = id;
-        }
-    }
-
-    //玩家选择杠
-    class GangMessage
-    {
-        // 玩家选择开杠的牌
-        public Pai gangpai;
-        // 0暗杠 1明杠 2加杠
-        public int type;
-
-        public GangMessage(Pai gp, int type)
-        {
-            this.gangpai = gp;
-            this.type = type;
-        }
-    }
-
+    /// <summary>
+    /// 发送给玩家允许副露
+    /// </summary>
     class FuluMessage
     {
         public Pai dapai;
@@ -112,4 +76,84 @@ namespace AlphaSoul
             dapai = p;
         }
     }
+
+    /// <summary>
+    /// 发送给玩家 局（风）结束消息
+    /// </summary>
+    class EndMessage
+    {
+
+    }
+
+
+
+    /* 以下为玩家消息 */
+
+    /// <summary>
+    /// 玩家选择 切牌
+    /// </summary>
+    class QiepaiMessage
+    {
+        // 切出的牌
+        public Pai qiepai;
+        public int from;
+
+        public QiepaiMessage(Pai a, int b)
+        {
+            qiepai = a;
+            from = b;
+        }
+    }
+
+    /// <summary>
+    /// 玩家选择 胡牌
+    /// </summary>
+    class HuMessage
+    {
+        public Pai rongpai;
+        public int from;
+        //public PtResult res;
+
+        public HuMessage(Pai p, int id)
+        {
+            rongpai = p;
+            from = id;
+        }
+    }
+
+    /// <summary>
+    /// 玩家选择 杠牌
+    /// </summary>
+    class GangMessage
+    {
+        // 玩家选择开杠的牌
+        public Pai gangpai;
+        // 0暗杠 1明杠 2加杠
+        public int type;
+        // 来自的ai编号
+        public int from;
+
+        public GangMessage(Pai gp, int type)
+        {
+            this.gangpai = gp;
+            this.type = type;
+        }
+    }
+
+    /// <summary>
+    /// 玩家选择碰
+    /// </summary>
+    class PengMessage
+    {
+
+    }
+
+    /// <summary>
+    /// 玩家选择吃
+    /// </summary>
+    class ChiMessage
+    {
+
+    }
+
 }

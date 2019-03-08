@@ -9,7 +9,7 @@
         Loaded="Window_Loaded">
     <DockPanel>
         <Menu DockPanel.Dock="Top" >
-            <MenuItem Header="牌山刷新" Click="MenuItem_Click" Height="25" />
+            <MenuItem Header="小工具" Click="MenuItem_Click" Height="25" />
             <MenuItem Header="开始对局" Click="MenuItem_Click_1" Height="25" />
             <MenuItem Header="停止对局" Click="MenuItem_Click_2" Height="25"/>
             <MenuItem Header="下一步" Click="MenuItem_Click_3" Height="25" />
@@ -75,72 +75,85 @@
             </StackPanel>
         </Canvas>
         <DockPanel>
-            <StackPanel DockPanel.Dock="Top" Height="200">
-                <Label>AI信息</Label>
-                <TextBlock Name="aiTextBlock"></TextBlock>
+            <StackPanel DockPanel.Dock="Bottom">
+                <Label>AI_0信息</Label>
+                <Grid>
+                    <Grid.DataContext>
+                        <local:AIStatic />
+                    </Grid.DataContext>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0">场风</Label>
+                    <Label Grid.Row="0" Grid.Column="1" Content="{ Binding Path=zhuangfeng }"/>
+                    <Label Grid.Row="0" Grid.Column="2">自风</Label>
+                    <Label Grid.Row="0" Grid.Column="3" Content="{ Binding Path=zifeng }" />
+                </Grid>
+                <Label>统计信息</Label>
+                <Grid Height="150" x:Name="aiStaticGrid">
+                    <Grid.DataContext>
+                        <local:AIStatic />
+                    </Grid.DataContext>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0">1位率</Label>
+                    <Label Grid.Row="0" Grid.Column="1" Content="{Binding Path=rate[0] }"/>
+                    <Label Grid.Row="1" Grid.Column="0">2位率</Label>
+                    <Label Grid.Row="1" Grid.Column="1" Content="{Binding Path=rate[1] }"/>
+                    <Label Grid.Row="2" Grid.Column="0">3位率</Label>
+                    <Label Grid.Row="2" Grid.Column="1" Content="{Binding Path=rate[2] }"/>
+                    <Label Grid.Row="3" Grid.Column="0">4位率</Label>
+                    <Label Grid.Row="3" Grid.Column="1" Content="{Binding Path=rate[3] }"/>
+                    <Label Grid.Row="4" Grid.Column="0">被飞率</Label>
+                    <Label Grid.Row="4" Grid.Column="1" Content="{Binding Path=rateMinus }"/>
+                    <Label Grid.Row="0" Grid.Column="2">总局数</Label>
+                    <Label Grid.Row="0" Grid.Column="3" Content="{ Binding Path=plays }"/>
+                    <Label Grid.Row="1" Grid.Column="2">平均打点</Label>
+                    <Label Grid.Row="1" Grid.Column="3" Content="{ Binding Path=avePt }"/>
+                    <Label Grid.Row="2" Grid.Column="2">平均顺位</Label>
+                    <Label Grid.Row="2" Grid.Column="3" Content="{ Binding Path=aveRank }"/>
+                    <Label Grid.Row="3" Grid.Column="2">最大连庄</Label>
+                    <Label Grid.Row="3" Grid.Column="3" Content="{ Binding Path=maxZhuang }"/>
+                    <Label Grid.Row="4" Grid.Column="2">和了巡数</Label>
+                    <Label Grid.Row="4" Grid.Column="3" Content="{ Binding Path=aveXun }"/>
+                    <Label Grid.Row="0" Grid.Column="4">和牌率</Label>
+                    <Label Grid.Row="0" Grid.Column="5" Content="{ Binding Path=rateHu }"/>
+                    <Label Grid.Row="1" Grid.Column="4">自摸率</Label>
+                    <Label Grid.Row="1" Grid.Column="5" Content="{ Binding Path=rateZimo }"/>
+                    <Label Grid.Row="2" Grid.Column="4">放铳率</Label>
+                    <Label Grid.Row="2" Grid.Column="5" Content="{ Binding Path=rateChong }"/>
+                    <Label Grid.Row="3" Grid.Column="4">副露率</Label>
+                    <Label Grid.Row="3" Grid.Column="5" Content="{ Binding Path=rateFulu }"/>
+                    <Label Grid.Row="4" Grid.Column="4">立直率</Label>
+                    <Label Grid.Row="4" Grid.Column="5" Content="{ Binding Path=rateLizhi }"/>
+                    <Label Grid.Row="5" Grid.ColumnSpan="6" Content="{ Binding  Path=maxPt }"/>
+                </Grid>
             </StackPanel>
             <StackPanel>
-                <DockPanel>
-                    <Button DockPanel.Dock="Right" Width="60" Click="Ron_Click">判定</Button>
-                    <Button DockPanel.Dock="Right" Width="60" Click="Button_Click_2">自动填充</Button>
-                    <Label>荣和判定</Label>
-                </DockPanel>
-                <WrapPanel>
-                    <Label>场风</Label>
-                    <ComboBox Width="50" SelectionChanged="ComboBox_SelectionChanged">
-                        <TextBlock Text="东"/>
-                        <TextBlock Text="南"/>
-                        <TextBlock Text="西"/>
-                    </ComboBox>
-                    <Label>自风</Label>
-                    <ComboBox  Width="50" SelectionChanged="ComboBox_SelectionChanged_1">
-                        <TextBlock Text="东"/>
-                        <TextBlock Text="南"/>
-                        <TextBlock Text="西"/>
-                        <TextBlock Text="北"/>
-                    </ComboBox>
-                    <Label>立直</Label>
-                    <ComboBox  Width="50" SelectionChanged="ComboBox_SelectionChanged_2">
-                        <TextBlock Text="无"/>
-                        <TextBlock Text="立直"/>
-                        <TextBlock Text="两立直"/>
-                    </ComboBox>
-                    <Label>和牌</Label>
-                    <ComboBox  Width="50" SelectionChanged="ComboBox_SelectionChanged_3">
-                        <TextBlock Text="自摸"/>
-                        <TextBlock Text="放铳"/>
-                    </ComboBox>
-                </WrapPanel>
-                <DockPanel>
-                    <Label DockPanel.Dock="Left">宝牌表示</Label>
-                    <TextBox >1s</TextBox>
-                </DockPanel>
-                <DockPanel Height="25">
-                    <TextBox DockPanel.Dock="Right" Name="MoTextBox" Width="50" >7m</TextBox>
-                    <Label DockPanel.Dock="Right">胡牌</Label>
-                    <Label>手牌</Label>
-                    <TextBox Name="PaiTextBox">1m1m2m2m3m3m4m4m5m5m6m6m7m</TextBox>
-                </DockPanel>
-                <DockPanel>
-                    <Label DockPanel.Dock="Left">牌面:</Label>
-                    <Label Name="DispLabel"/>
-                </DockPanel>
-                <DockPanel>
-                    <Label DockPanel.Dock="Left">结果:</Label>
-                    <Label Name="RonCodeLabel"/>
-                </DockPanel>
-                <DockPanel>
-                    <Label DockPanel.Dock="Left">拆分形:</Label>
-                    <Label Name="FanLabel"/>
-                </DockPanel>
-                <DockPanel>
-                    <Label DockPanel.Dock="Left">判定形:</Label>
-                    <Label Name="PtLabel"/>
-                </DockPanel>
-                <DockPanel>
-                    <Label DockPanel.Dock="Left">最大番数: </Label>
-                    <Label Name="PtLabel2"/>
-                </DockPanel>
+                <Label>游戏信息</Label>
+                <TextBlock Name="aiTextBlock">aaa</TextBlock>
             </StackPanel>
         </DockPanel>
     </DockPanel>

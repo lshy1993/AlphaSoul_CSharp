@@ -1,0 +1,72 @@
+﻿<Window x:Class="AlphaSoul.ToolWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AlphaSoul"
+        mc:Ignorable="d"
+        Title="ToolWindow" Height="450" Width="400">
+    <StackPanel>
+        <DockPanel>
+            <Button DockPanel.Dock="Right" Width="60" Click="Ron_Click">判定</Button>
+            <Button DockPanel.Dock="Right" Width="60" Click="Button_Click_2">自动填充</Button>
+            <Label>荣和判定</Label>
+        </DockPanel>
+        <WrapPanel>
+            <Label>场风</Label>
+            <ComboBox Width="50" SelectionChanged="ComboBox_SelectionChanged">
+                <TextBlock Text="东"/>
+                <TextBlock Text="南"/>
+                <TextBlock Text="西"/>
+            </ComboBox>
+            <Label>自风</Label>
+            <ComboBox  Width="50" SelectionChanged="ComboBox_SelectionChanged_1">
+                <TextBlock Text="东"/>
+                <TextBlock Text="南"/>
+                <TextBlock Text="西"/>
+                <TextBlock Text="北"/>
+            </ComboBox>
+            <Label>立直</Label>
+            <ComboBox  Width="50" SelectionChanged="ComboBox_SelectionChanged_2">
+                <TextBlock Text="无"/>
+                <TextBlock Text="立直"/>
+                <TextBlock Text="两立直"/>
+            </ComboBox>
+            <Label>和牌</Label>
+            <ComboBox  Width="50" SelectionChanged="ComboBox_SelectionChanged_3">
+                <TextBlock Text="自摸"/>
+                <TextBlock Text="放铳"/>
+            </ComboBox>
+        </WrapPanel>
+        <DockPanel>
+            <Label DockPanel.Dock="Left">宝牌表示</Label>
+            <TextBox >1s</TextBox>
+        </DockPanel>
+        <DockPanel Height="25">
+            <TextBox DockPanel.Dock="Right" Name="MoTextBox" Width="50" >7m</TextBox>
+            <Label DockPanel.Dock="Right">胡牌</Label>
+            <Label>手牌</Label>
+            <TextBox Name="PaiTextBox">1m1m2m2m3m3m4m4m5m5m6m6m7m</TextBox>
+        </DockPanel>
+        <DockPanel>
+            <Label DockPanel.Dock="Left">牌面:</Label>
+            <Label Name="DispLabel"/>
+        </DockPanel>
+        <DockPanel>
+            <Label DockPanel.Dock="Left">结果:</Label>
+            <Label Name="RonCodeLabel"/>
+        </DockPanel>
+        <DockPanel>
+            <Label DockPanel.Dock="Left">拆分形:</Label>
+            <Label Name="FanLabel"/>
+        </DockPanel>
+        <DockPanel>
+            <Label DockPanel.Dock="Left">判定形:</Label>
+            <Label Name="PtLabel"/>
+        </DockPanel>
+        <DockPanel>
+            <Label DockPanel.Dock="Left">最大番数:</Label>
+            <Label Name="PtLabel2"/>
+        </DockPanel>
+    </StackPanel>
+</Window>

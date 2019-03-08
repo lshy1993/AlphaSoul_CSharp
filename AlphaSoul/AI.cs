@@ -29,12 +29,15 @@ namespace AlphaSoul
         // 个人信息
         private List<Pai> handStack;
         private List<string> fulu;
-        //private Pai mopai;
+
+        // ai统计信息
+        public AIStatic ailog;
 
         public AI_Core(int id)
         {
             ai_id = id;
             fulu = new List<string>();
+            ailog = new AIStatic();
         }
 
         // 设置该局信息
@@ -163,6 +166,7 @@ namespace AlphaSoul
         private void hule(object data)
         {
             // 统计工作
+            ailog.Update((PtResult)data);
         }
 
         /// <summary>
@@ -171,6 +175,7 @@ namespace AlphaSoul
         private void liuju(object data)
         {
             // 统计工作
+            ailog.Update((PtResult)data);
         }
 
         /// <summary>

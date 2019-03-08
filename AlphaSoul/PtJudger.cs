@@ -10,7 +10,7 @@ namespace AlphaSoul
     /// <summary>
     /// 役种
     /// </summary>
-    class Yaku
+    public class Yaku
     {
         public string name;
         public int fanshu;
@@ -34,21 +34,46 @@ namespace AlphaSoul
     /// <summary>
     /// 判定结果
     /// </summary>
-    class PtResult
+    public class PtResult
     {
+        /// <summary>
+        /// 所有可能的拆分面子
+        /// </summary>
         public List<Mianzi> mianziall;
+
+        /// <summary>
+        /// 选定的最大面子
+        /// </summary>
         public Mianzi mianzi;
-        // 役の名称と翻数のリスト
+
+        /// <summary>
+        /// 役名 番数
+        /// </summary>
         public List<Yaku> hupai;
-        // 符
+
+        /// <summary>
+        /// 符
+        /// </summary>
         public int fu;
-        // (全体の)翻数
+
+        /// <summary>
+        /// 总番数
+        /// </summary>
         public int fanshu;
-        // (役満の場合)複合しているか
+
+        /// <summary>
+        /// 役满数 负数
+        /// </summary>
         public int yiman;
-        // (供託を含めない)和了点
+
+        /// <summary>
+        /// 纯点数
+        /// </summary>
         public int defen;
-        // (供託を含めた)点数の移動
+
+        /// <summary>
+        /// 点数分配
+        /// </summary>
         public int[] fenpei;
 
         public PtResult()

@@ -11,16 +11,24 @@ namespace AlphaSoul
     /// </summary>
     public class GameStatus
     {
-        // 4家顺序 [2,4,3,1] 分别代表 AI2 4 3 1
+        /// <summary>
+        /// 4家原始顺序 [2,4,3,1] 分别代表 AI2 4 3 1
+        /// </summary>
         public int[] playerOrder;
-        // 庄家位置
+
+        /// <summary>
+        /// 当前庄家位置
+        /// </summary>
         public int qinjia;
-        // 4家自风
+
+        /// <summary>
+        /// 东南西北的各家
+        /// </summary>
         public int[] playerWind;
 
         // 场风
         public int changfeng;
-        // 局数 0-3
+        // 总局数
         public int jushu;
         // 储存场棒
         public int changbang;
@@ -31,8 +39,6 @@ namespace AlphaSoul
         // 宝牌 里宝牌
         public List<string> bao;
         public List<string> libao;
-        // 宝牌位置
-        public int baopos;
 
         // 每个玩家单独信息
         public PtParam[] playerParam = new PtParam[4];
@@ -40,7 +46,8 @@ namespace AlphaSoul
         public GameStatus()
         {
             playerOrder = InitOrder();
-            qinjia = new Random().Next(4);
+            //qinjia = new Random().Next(4);
+            qinjia = 0;
             // 例qinjia=2, 左移2次
             playerWind = (int[])playerOrder.Clone();
             for (int n = 0; n < qinjia; n++)
@@ -87,7 +94,11 @@ namespace AlphaSoul
         public void NextPlayer()
         {
             qinjia++;
-            if (qinjia > 3) qinjia = 0;
+            if (qinjia > 3)
+            {
+                qinjia = 0;
+                changfeng++;
+            }
             for (int n = 0; n < qinjia; n++)
             {
                 int temp = playerWind[0];
@@ -98,11 +109,6 @@ namespace AlphaSoul
                 playerWind[3] = temp;
             }
             jushu++;
-            if (jushu == 4)
-            {
-                jushu = 0;
-                changfeng++;
-            }
         }
 
         public string GetAIOrder()
