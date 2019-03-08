@@ -1,8 +1,5 @@
 ﻿################################################################################
-# 此 .gitignore 文件已由 Microsoft(R) Visual Studio 自动创建。
+# この .gitignore ファイルは Microsoft(R) Visual Studio によって自動的に作成されました。
 ################################################################################
 
 /.vs/AlphaSoul/v15
-/AlphaSoul/bin/Debug
-/AlphaSoul/obj/Debug
-/AlphaSoul/Properties
