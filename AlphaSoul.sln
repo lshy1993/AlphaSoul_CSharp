@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.28307.329
+VisualStudioVersion = 15.0.28307.438
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlphaSoul", "AlphaSoul\AlphaSoul.csproj", "{4050E16E-66C6-4131-8C6A-70843630BB22}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlphaSoul", "AlphaSoul\AlphaSoul.csproj", "{C4413DB1-8B27-4E68-A1E6-E24734D5DED2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4050E16E-66C6-4131-8C6A-70843630BB22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4050E16E-66C6-4131-8C6A-70843630BB22}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4050E16E-66C6-4131-8C6A-70843630BB22}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4050E16E-66C6-4131-8C6A-70843630BB22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4413DB1-8B27-4E68-A1E6-E24734D5DED2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4413DB1-8B27-4E68-A1E6-E24734D5DED2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4413DB1-8B27-4E68-A1E6-E24734D5DED2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4413DB1-8B27-4E68-A1E6-E24734D5DED2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {DD51D375-E5E6-46B0-8B25-537B2E6BCD89}
+		SolutionGuid = {76205138-EF9E-4333-BD80-5B518C704BD2}
 	EndGlobalSection
 EndGlobal

@@ -126,17 +126,19 @@ namespace AlphaSoul
             PaiListView.Items.Refresh();
 
             AIDist.Content = gm.curStatus.GetAIOrder();
+            PtDist.Content = gm.curStatus.get
             ChangDist.Content = gm.curStatus.GetWindOrder();
             BaoDist.Content = gm.curStatus.GetBao();
             LiDist.Content = gm.curStatus.GetBao(true);
-
 
             aiStaticGrid.DataContext = gm.getStatic();
         }
 
         public void RefreshAIUI(string text)
         {
+            PaiListView.ItemsSource = gm.yama;
             aiTextBlock.Text = text;
+            WindListView.ItemsSource = gm.history;
         }
 
         /// <summary>

@@ -23,12 +23,17 @@ namespace AlphaSoul
         private int lizhibang;
         // 4家分数
         private int[] score;
-        // 宝牌 里宝牌
+        // 宝牌
         private List<string> bao;
 
-        // 个人信息
+        // 个人手牌堆
         private List<Pai> handStack;
-        private List<string> fulu;
+        // 个人展露堆（含暗杠）
+        private List<string> fuluStack;
+        // 是否立直过
+        private bool flag_li;
+        // 是否副露过
+        private bool flag_fu;
 
         // ai统计信息
         public AIStatic ailog;
@@ -36,7 +41,7 @@ namespace AlphaSoul
         public AI_Core(int id)
         {
             ai_id = id;
-            fulu = new List<string>();
+            fuluStack = new List<string>();
             ailog = new AIStatic();
         }
 
@@ -57,7 +62,7 @@ namespace AlphaSoul
         public void InitStack(List<Pai> shoupai)
         {
             handStack = new List<Pai>(shoupai);
-            fulu.Clear();
+            fuluStack.Clear();
         }
 
         public object Action(string type, object data)
@@ -108,7 +113,7 @@ namespace AlphaSoul
             Pai dapai = msg.mopai;
             handStack.Add(dapai);
             // 计算当前向听数
-            int n_xiangting = TingJudger.xiangting(PaiMaker.GetCount(handStack), fulu);
+            int n_xiangting = TingJudger.xiangting(PaiMaker.GetCount(handStack), fuluStack);
             int max = 0;
             // 遍历手牌
             for (int i = 0; i < handStack.Count; i++)
@@ -119,9 +124,9 @@ namespace AlphaSoul
                 newhand.Remove(p);
                 Dictionary<char, int[]> newPaiCount = PaiMaker.GetCount(newhand);
                 // 不选择向听数减少的情形？
-                if (TingJudger.xiangting(newPaiCount, fulu) > n_xiangting) continue;
+                if (TingJudger.xiangting(newPaiCount, fuluStack) > n_xiangting) continue;
                 // 选择
-                var tingpai = TingJudger.tingpai(newPaiCount, fulu);
+                var tingpai = TingJudger.tingpai(newPaiCount, fuluStack);
                 int n_tingpai = tingpai.Count;
 
                 // 选择 切出后 进张总类数最多的牌
@@ -165,8 +170,9 @@ namespace AlphaSoul
         /// </summary>
         private void hule(object data)
         {
+            EndMessage emsg = (EndMessage)data;
             // 统计工作
-            ailog.Update((PtResult)data);
+            ailog.Update(emsg.res, flag_fu, flag_li);
         }
 
         /// <summary>
@@ -174,8 +180,9 @@ namespace AlphaSoul
         /// </summary>
         private void liuju(object data)
         {
+            LiujuMessage lmsg = (LiujuMessage)data;
             // 统计工作
-            ailog.Update((PtResult)data);
+            ailog.Update(flag_fu, flag_li);
         }
 
         /// <summary>

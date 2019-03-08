@@ -35,18 +35,22 @@ namespace AlphaSoul
     /// </summary>
     class LiujuMessage
     {
-        // 流局理由 "九种" "四风" "四杠" "荒牌"
+        /// <summary>
+        /// 流局理由 0"九种" 1"四风" 2"四杠" 3"荒牌"
+        /// </summary>
         public int type = 0;
         public string name;
 
-        // 流局时的手牌
+        // 流局时的4家手牌
         public string[] shoupai = new string[4];
         // 局収支
         public int[] fenpei = new int[4];
+        // 4家是否立直
+        public bool[] lizhi = new bool[4];
 
-        static string[] typeStr = new string[] { "九种九牌", "四风连打", "四杠散了", "荒牌流局" };
+        private static string[] typeStr = new string[] { "九种九牌", "四风连打", "四杠散了", "荒牌流局" };
 
-        public LiujuMessage(int a)
+        public LiujuMessage(int a=0)
         {
             type = a;
             name = typeStr[type];
@@ -82,12 +86,21 @@ namespace AlphaSoul
     /// </summary>
     class EndMessage
     {
+        // 当前的参数
+        public PtParam param;
+        // 是否胡牌
+        public PtResult res;
+        // 玩家手牌
 
+        public EndMessage(PtParam param)
+        {
+            this.param = param;
+        }
     }
 
 
 
-    /* 以下为玩家消息 */
+    /* 以下为玩家AI消息 */
 
     /// <summary>
     /// 玩家选择 切牌
@@ -152,6 +165,14 @@ namespace AlphaSoul
     /// 玩家选择吃
     /// </summary>
     class ChiMessage
+    {
+
+    }
+
+    /// <summary>
+    /// 玩家选择9种流局
+    /// </summary>
+    class JiuMessage
     {
 
     }

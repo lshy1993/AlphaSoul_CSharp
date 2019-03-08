@@ -15,13 +15,13 @@ namespace AlphaSoul
     public class Game
     {
         public MainWindow mw;
-        //总牌山
+        // 总牌山
         public ObservableCollection<Pai> yama = new ObservableCollection<Pai>();
-        //玩家手牌
+        // 玩家手牌
         public List<Pai>[] PaiStack = new List<Pai>[4];
-        //牌河
+        // 牌河
         public ObservableCollection<Pai>[] River = new ObservableCollection<Pai>[4];
-        //鸣牌区域
+        // 鸣牌区域
         public ObservableCollection<Pai>[] Fulu = new ObservableCollection<Pai>[4];
 
         // 牌山位置指示
@@ -32,8 +32,10 @@ namespace AlphaSoul
         // 终局指示
         private bool endGame;
 
-        //当前对局信息
+        // 当前对局信息
         public GameStatus curStatus;
+        // 历史对局
+        public ObservableCollection<GameHistory> history = new ObservableCollection<GameHistory>();
 
         private AI_Core[] player;
 
@@ -154,6 +156,7 @@ namespace AlphaSoul
             // 自动牌局 东风起手
             curWind = 0;
             bool endSection = false;
+            bool lianzhuang = true;
             object callback = null;
             // 主循环
             while (!endSection)
@@ -186,8 +189,17 @@ namespace AlphaSoul
                     // 向所有的玩家发送结束消息
                     foreach (int id in curStatus.playerWind)
                     {
-                        player[id].Action("hule", ptr);
+                        EndMessage emsg = new EndMessage(curStatus.playerParam[id]);
+                        if (id == hmsg.from) emsg.res = ptr;
+                        player[id].Action("hule", emsg);
                     }
+                    GameHistory gg = new GameHistory();
+                    gg.wind = curStatus.GetWind();
+                    gg.res = "自摸";
+                    gg.pt = ptr.fenpei;
+                    mw.Dispatcher.Invoke(new Action(() => {
+                        history.Add(gg);
+                    }));
                     endSection = true;
                 }
                 else if (callback.GetType() == typeof(QiepaiMessage))
@@ -210,6 +222,7 @@ namespace AlphaSoul
                             FuluMessage fmsg = allow_fulu(PaiStack[id], dapai, curStatus.playerParam[id]);
                             subcallback = player[id].Action("fulu", fmsg);
                         }
+                        if (subcallback == null) continue;
                         if (subcallback.GetType() == typeof(HuMessage))
                         {
                             mlist_hu.Add((HuMessage)subcallback);
@@ -228,45 +241,96 @@ namespace AlphaSoul
                         }
                     }
                     // 判定优先级 胡>碰>吃
-                    // TODO 多人放铳在这里处理
-                    EndMessage emsg = new EndMessage();
-                    // 向所有的玩家发送结束消息
-                    foreach (int id in curStatus.playerWind)
+                    if (mlist_hu.Count > 0)
                     {
-                        player[id].Action("hule", emsg);
-                    }
-                    // 否则进入牌河
-                    River[playerid].Add(dapai);
-                    dapai.stat = curStatus.playerParam[playerid].zifeng + 4;
-                    // 轮到下一个玩家/荒牌流局
-                    if (yamaPos == yamaLast - 14)
-                    {
-                        LiujuMessage lj = new LiujuMessage(1);
-                        for(int i = 0; i < 4; i++)
+                        GameHistory gg = new GameHistory();
+                        gg.wind = curStatus.GetWind();
+                        gg.res = "放铳";
+                        // TODO 多人放铳在这里处理
+                        foreach (HuMessage hm in mlist_hu)
                         {
-                            int pid = curStatus.playerWind[i];
-                            lj.shoupai[i] = PaiMaker.GetCode(PaiStack[pid]);
+                            int a = hm.from;
+                            // 计算点数
+                            PtResult ptr = new PtJudger().Judge(PaiStack[a], hm.rongpai, curStatus.playerParam[a]);
+                            for (int i = 0; i < 4; i++) gg.pt[i] += ptr.fenpei[i];
                         }
-                        callback = lj;
+                        // 向所有的玩家发送结束消息
+                        foreach (int id in curStatus.playerWind)
+                        {
+                            EndMessage emsg = new EndMessage(curStatus.playerParam[id]);
+                            player[id].Action("hule", emsg);
+                        }
+                        mw.Dispatcher.Invoke(new Action(() => {
+                            history.Add(gg);
+                        }));
+                        endSection = true;
+                    }
+                    else if(mlist_gang.Count == 1)
+                    {
+                        // 杠
+                    }
+                    else if(mlist_peng.Count == 1)
+                    {
+                        // 碰
+                    }
+                    else if (mlist_chi.Count == 1)
+                    {
+                        // 吃
                     }
                     else
                     {
-                        // 下个风
-                        curWind += 1;
-                        if (curWind > 3) curWind = 0;
-                        callback = null;
+                        // 无人回应 则弃牌进入牌河
+                        River[playerid].Add(dapai);
+                        dapai.stat = curStatus.playerParam[playerid].zifeng + 4;
+                        // 判定
+                        if (yamaPos == yamaLast - 14)
+                        {
+                            // 向所有玩家发送荒牌流局
+                            LiujuMessage lj = new LiujuMessage(3);
+                            for (int i = 0; i < 4; i++)
+                            {
+                                int pid = curStatus.playerWind[i];
+                                lj.shoupai[i] = PaiMaker.GetCode(PaiStack[pid]);
+                            }
+                            // 向所有玩家发送流局（结束）消息
+                            foreach (int id in curStatus.playerWind)
+                            {
+                                player[id].Action("liuju", lj);
+                            }
+                            GameHistory gg = new GameHistory();
+                            gg.wind = curStatus.GetWind();
+                            gg.res = "流局";
+                            gg.pt = lj.fenpei;
+                            mw.Dispatcher.Invoke(new Action(() => {
+                                history.Add(gg);
+                            }));
+                            endSection = true;
+                        }
+                        else
+                        {
+                            // 轮到下一个风玩家
+                            curWind += 1;
+                            if (curWind > 3) curWind = 0;
+                            callback = null;
+                        }
                     }
 
                 }
-                else if (callback.GetType() == typeof(LiujuMessage))
+                else if (callback.GetType() == typeof(JiuMessage))
                 {
                     // 玩家主动选择流局
-
-                    //向所有玩家发送流局（结束）消息
+                    LiujuMessage lj = new LiujuMessage();
+                    // 向所有玩家发送流局（结束）消息
                     foreach (int id in curStatus.playerWind)
                     {
-                        player[id].Action("liuju", null);
+                        player[id].Action("liuju", lj);
                     }
+                    GameHistory gg = new GameHistory();
+                    gg.wind = curStatus.GetWind();
+                    gg.res = "九种九牌";
+                    mw.Dispatcher.Invoke(new Action(() => {
+                        history.Add(gg);
+                    }));
                     endSection = true;
                 }
                 else if (callback.GetType() == typeof(GangMessage))
@@ -304,14 +368,8 @@ namespace AlphaSoul
                 }
                 // 记录牌谱
             }
-            //向所有玩家发送单局结果
-            foreach (int id in curStatus.playerWind)
-            {
-                player[id].Action("jieguo", new object());
-            }
-            //连庄判定
-            bool lianzhuang = true;
-            // 以下变更设置
+
+            // 连庄判定以下变更设置
             if (!lianzhuang)
             {
                 // 流庄后 重新分配风

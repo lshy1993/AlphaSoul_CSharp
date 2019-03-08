@@ -78,11 +78,7 @@
             <StackPanel DockPanel.Dock="Bottom">
                 <Label>AI_0信息</Label>
                 <Grid>
-                    <Grid.DataContext>
-                        <local:AIStatic />
-                    </Grid.DataContext>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="30"/>
                         <RowDefinition Height="30"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -97,7 +93,7 @@
                     <Label Grid.Row="0" Grid.Column="3" Content="{ Binding Path=zifeng }" />
                 </Grid>
                 <Label>统计信息</Label>
-                <Grid Height="150" x:Name="aiStaticGrid">
+                <Grid x:Name="aiStaticGrid">
                     <Grid.DataContext>
                         <local:AIStatic />
                     </Grid.DataContext>
@@ -151,10 +147,25 @@
                     <Label Grid.Row="5" Grid.ColumnSpan="6" Content="{ Binding  Path=maxPt }"/>
                 </Grid>
             </StackPanel>
-            <StackPanel>
-                <Label>游戏信息</Label>
+            <DockPanel>
+                <ListView DockPanel.Dock="Bottom" Height="150" Name="WindListView">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="局" Width="60" DisplayMemberBinding="{Binding Path=wind}"/>
+                            <GridViewColumn Header="结果" Width="60" DisplayMemberBinding="{Binding Path=res}"/>
+                            <GridViewColumn Header="AI0" Width="60" DisplayMemberBinding="{Binding Path=pt[0]}"/>
+                            <GridViewColumn Header="AI1" Width="60" DisplayMemberBinding="{Binding Path=pt[1]}"/>
+                            <GridViewColumn Header="AI2" Width="60" DisplayMemberBinding="{Binding Path=pt[2]}"/>
+                            <GridViewColumn Header="AI3" Width="60" DisplayMemberBinding="{Binding Path=pt[3]}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+                <StackPanel>
+                    <Label>游戏信息</Label>
                 <TextBlock Name="aiTextBlock">aaa</TextBlock>
-            </StackPanel>
+                </StackPanel>
+                
+            </DockPanel>
         </DockPanel>
     </DockPanel>
 </Window>

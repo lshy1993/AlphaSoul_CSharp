@@ -43,6 +43,8 @@ namespace AlphaSoul
         // 每个玩家单独信息
         public PtParam[] playerParam = new PtParam[4];
 
+        public static string[] windStr = new string[4] { "东", "南", "西", "北" };
+
         public GameStatus()
         {
             playerOrder = InitOrder();
@@ -60,7 +62,7 @@ namespace AlphaSoul
                 playerWind[3] = temp;
             }
             changfeng = 0;
-            jushu = 0;
+            jushu = 1;
             changbang = 0;
             lizhibang = 0;
             score = new int[4] { 25000, 25000, 25000, 25000 };
@@ -111,6 +113,11 @@ namespace AlphaSoul
             jushu++;
         }
 
+        public string GetWind()
+        {
+            return string.Format("{0}{1}局", windStr[changfeng], jushu);
+        }
+
         public string GetAIOrder()
         {
             string str = "AI：";
@@ -124,7 +131,6 @@ namespace AlphaSoul
         public string GetWindOrder()
         {
             string str = "";
-            string[] windStr = new string[4] { "东", "南", "西", "北" };
             for(int i = 0; i < 4; i++)
             {
                 str += windStr[i] + ": " + playerWind[i];
