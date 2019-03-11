@@ -69,20 +69,32 @@ namespace AlphaSoul
             return resArr;
         }
 
+        /// <summary>
+        /// 手牌统计
+        /// </summary>
+        /// <param name="plist"></param>
+        /// <returns></returns>
         public static Dictionary<char, int[]> GetCount(List<Pai> plist)
         {
-            Dictionary<char, int[]> count = new Dictionary<char, int[]>();
-            count.Add('m', new int[10]);
-            count.Add('p', new int[10]);
-            count.Add('s', new int[10]);
-            count.Add('z', new int[8]);
+            Dictionary<char, int[]> paiCount = new Dictionary<char, int[]>();
+            paiCount.Add('m', new int[10]);
+            paiCount.Add('p', new int[10]);
+            paiCount.Add('s', new int[10]);
+            paiCount.Add('z', new int[8]);
             foreach (Pai p in plist)
             {
-                count[p.type][p.num]++;
+                // 红宝计算2次
+                if (p.num == 0) paiCount[p.type][5] += 1;
+                paiCount[p.type][p.num] += 1;
             }
-            return count;
+            return paiCount;
         }
 
+
+        /// <summary>
+        /// 获取牌代码
+        /// </summary>
+        /// <param name="plist"></param>
         public static string GetCode(List<Pai> plist)
         {
             string codeStr = "";
@@ -93,5 +105,18 @@ namespace AlphaSoul
             return codeStr;
         }
 
+        /// <summary>
+        /// 获取牌面
+        /// </summary>
+        /// <param name="plist"></param>
+        public static string GetDisp(List<Pai> plist)
+        {
+            string codeStr = "";
+            foreach (Pai p in plist)
+            {
+                codeStr += p.display;
+            }
+            return codeStr;
+        }
     }
 }

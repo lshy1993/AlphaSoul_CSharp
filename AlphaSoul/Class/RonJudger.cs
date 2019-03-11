@@ -10,23 +10,23 @@ namespace AlphaSoul
     public class RonJudger
     {
         /// <summary>
-        /// 荣和判定
+        /// 荣和判定面子拆分
         /// </summary>
-        /// <returns></returns>
-        public List<Mianzi> Ron(Dictionary<char, int[]> paiCount, Pai moPai)
+        public List<Mianzi> Ron(List<Pai> hand, string moPai, List<string> fulu)
         {
+            Dictionary<char, int[]> paiCount = PaiMaker.GetCount(hand);
             List<Mianzi> mianzi = new List<Mianzi>();
-            //七对子判定
+            // 七对子判定
             Mianzi temp = Ron_qiduizi(paiCount, moPai);
             if (temp != null) mianzi.Add(temp);
-            //国士无双判定
+            // 国士无双判定
             temp = Ron_guoshi(paiCount, moPai);
             if (temp != null) mianzi.Add(temp);
-            //九宝莲灯
+            // 九宝莲灯
             temp = Ron_jiulian(paiCount, moPai);
             if (temp != null) mianzi.Add(temp);
-            //一般 4面1头形
-            foreach (Mianzi mz in Ron_normal(paiCount, moPai))
+            // 一般 4面1头形
+            foreach (Mianzi mz in Ron_normal(paiCount, moPai, fulu))
             {
                 if (mz == null) continue;
                 mianzi.Add(mz);
@@ -38,7 +38,7 @@ namespace AlphaSoul
         /// <summary>
         /// 七对子判定
         /// </summary>
-        public Mianzi Ron_qiduizi(Dictionary<char, int[]> paiCount, Pai hulepai)
+        public Mianzi Ron_qiduizi(Dictionary<char, int[]> paiCount, string hulepai)
         {
             Mianzi mz = new Mianzi();
             List<string> paixing = new List<string>();
@@ -53,9 +53,9 @@ namespace AlphaSoul
                     if (pcount == 2)
                     {
                         string p = ch + n.ToString() + n.ToString();
-                        if (ch == hulepai.type && n == hulepai.num)
+                        if (ch == hulepai[1] && n == (hulepai[0]-'0'))
                         {
-                            p += "!";
+                            p += hulepai[2] + "!";
                         }
                         paixing.Add(p);
                     }
@@ -73,7 +73,7 @@ namespace AlphaSoul
         /// <summary>
         /// 国士无双
         /// </summary>
-        public Mianzi Ron_guoshi(Dictionary<char, int[]> paiCount, Pai hulepai)
+        public Mianzi Ron_guoshi(Dictionary<char, int[]> paiCount, string hulepai)
         {
             Mianzi mz = new Mianzi();
             List<string> paixing = new List<string>();
@@ -98,9 +98,9 @@ namespace AlphaSoul
                     if (shoupai[n] == 2)
                     {
                         string p = ch + n.ToString() + n.ToString();
-                        if (ch == hulepai.type && n == hulepai.num)
+                        if (ch == hulepai[1] && n == (hulepai[0]-'0'))
                         {
-                            p += "!";
+                            p += hulepai[2] + "!";
                         }
                         paixing.Add(p);
                         you_duizi = true;
@@ -108,9 +108,9 @@ namespace AlphaSoul
                     else if (shoupai[n] == 1)
                     {
                         string p = ch + n.ToString();
-                        if (ch == hulepai.type && n == hulepai.num)
+                        if (ch == hulepai[1] && n == (hulepai[0] - '0'))
                         {
-                            p += "!";
+                            p += hulepai[2] + "!";
                         }
                         paixing.Add(p);
                     }
@@ -124,7 +124,7 @@ namespace AlphaSoul
             return mz;
         }
 
-        public Mianzi Ron_jiulian(Dictionary<char, int[]> paiCount, Pai hulepai)
+        public Mianzi Ron_jiulian(Dictionary<char, int[]> paiCount, string hulepai)
         {
             Mianzi mz = new Mianzi();
             List<string> paixing = new List<string>();
@@ -150,13 +150,13 @@ namespace AlphaSoul
                     //缺少某一个数字则无效 足りない数牌がある場合、和了形でない
                     if (shoupai[n] == 0) return null;
                     //牌数
-                    int nn = (n == hulepai.num) ? shoupai[n] - 1 : shoupai[n];
+                    int nn = (n == hulepai[0] - '0') ? shoupai[n] - 1 : shoupai[n];
                     for (var i = 0; i < nn; i++)
                     {
                         p += n;
                     }
                 }
-                p += hulepai.num + "!";
+                p += hulepai[0] + "!";
                 paixing.Add(p);
                 mz.paizu = paixing;
                 return mz;
@@ -169,7 +169,7 @@ namespace AlphaSoul
         /// <summary>
         /// 一般型判定
         /// </summary>
-        private List<Mianzi> Ron_normal(Dictionary<char, int[]> paiCount, Pai hulepai)
+        private List<Mianzi> Ron_normal(Dictionary<char, int[]> paiCount, string hulepai, List<string> fulu)
         {
             List<Mianzi> mzlist = new List<Mianzi>();
 
@@ -192,9 +192,9 @@ namespace AlphaSoul
                     {
                         List<string> temp = new List<string>();
                         temp.Add(jiangpai);
-                        mianzi.paizu = temp.Concat(mianzi.paizu).ToList();
+                        mianzi.paizu = temp.Concat(mianzi.paizu).Concat(fulu).ToList();
                         if (mianzi.paizu.Count() != 5) continue;
-                        //TODO: 整理
+                        // TODO: 整理
                         foreach (Mianzi mark in AddMark(mianzi.paizu, hulepai))
                         {
                             mzlist.Add(mark);
@@ -314,18 +314,19 @@ namespace AlphaSoul
             return;
         }
 
-        private List<Mianzi> AddMark(List<string> mianzi, Pai p)
+        private List<Mianzi> AddMark(List<string> mianzi, string p)
         {
-            string regexp = "^(" + p.type + ".*" + (p.num != 0 ? p.num.ToString() : "5") + ")";
-            string replacer = "$1" + "!";
+            //string regexp = "^(" + p.type + ".*" + (p.num != 0 ? p.num.ToString() : "5") + ")";
+            string regexp = "^(" + p[1] + ".*" + (p[0] != '0' ? p[0].ToString() : "5") + ")";
+            string replacer = "$1" + p[2] + "!";
 
             List<Mianzi> new_mianzi = new List<Mianzi>();
 
             for (int i=0;i<mianzi.Count;i++)
             {
-                //副露面
+                // 副露面
                 if (Regex.IsMatch(mianzi[i],@"[\-\+\=]")) continue;
-                //相同略
+                // 相同略
                 if (i > 0 && mianzi[i] == mianzi[i - 1]) continue;
                 string m = Regex.Replace(mianzi[i], regexp, replacer);
                 if (m == mianzi[i]) continue;

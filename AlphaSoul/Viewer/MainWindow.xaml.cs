@@ -24,6 +24,7 @@ namespace AlphaSoul
     {
         private Game gm;
         private Thread aithread;
+        string[] windStr = new string[4] { "东", "南", "西", "北" };
 
         public MainWindow()
         {
@@ -33,21 +34,12 @@ namespace AlphaSoul
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             //YamaInit();
+            gm = new Game(this);
         }
 
         private void YamaInit()
         {
             YamaCodeTextBlock.Text = PaiMaker.GetCode(gm.yama.ToList());
-            //WrapStock.Children.Clear();
-            //for (int i = 0; i < 136; i++)
-            //{
-            //    Label lb = new Label();
-            //    lb.SetBinding(Label.ContentProperty, new Binding("display") { Source = gm.yama[i], Mode=BindingMode.OneWay });
-            //    lb.SetBinding(Label.ForegroundProperty, new Binding("foreBrush") { Source = gm.yama[i], Mode = BindingMode.OneWay });
-            //    lb.SetBinding(Label.BackgroundProperty, new Binding("backBrush") { Source = gm.yama[i], Mode = BindingMode.OneWay });
-            //    WrapStock.Children.Add(lb);
-            //}
-            //PaiListView.ItemsSource = gm.yama;
         }
 
         public void RefreshUI()
@@ -92,6 +84,7 @@ namespace AlphaSoul
             StackPanel[] splist = new StackPanel[4] { StackPanel_D, StackPanel_R, StackPanel_U, StackPanel_L };
             //牌河堆panel
             WrapPanel[] rvlist = new WrapPanel[4] { StackPanel_DR, StackPanel_RR, StackPanel_UR, StackPanel_LR };
+            Label[] lblist = new Label[4] { Info_D, Info_R, Info_U, Info_L };
             //UI刷新
             for (int i = 0; i < 4; i++)
             {
@@ -122,23 +115,44 @@ namespace AlphaSoul
                     }
                     rvp.Children.Add(lb);
                 }
+                
+                //string feng = windStr[gm.curStatus.playerParam[i].zifeng];
+                string feng = windStr[gm.curStatus.zifeng[i]];
+                string fen = gm.curStatus.score[i].ToString();
+                //string li = gm.curStatus.playerParam[i].lizhi > 0 ? "立直" : "";
+                string li = gm.curStatus.lizhi[i] > 0 ? "立直" : "";
+                lblist[i].Content = string.Format("AI_{0} {1} {2} {3}", i, feng, fen, li);
             }
             PaiListView.Items.Refresh();
 
-            AIDist.Content = gm.curStatus.GetAIOrder();
-            PtDist.Content = gm.curStatus.get
-            ChangDist.Content = gm.curStatus.GetWindOrder();
+            PtDist.Content = gm.curStatus.GetPtList();
+            //ChangDist.Content = gm.curStatus.GetWindOrder();
+            ChangDist.Content = string.Format("场风：{0} 场：{1} 立：{2}", windStr[gm.curStatus.changfeng], gm.curStatus.changbang, gm.curStatus.lizhibang);
             BaoDist.Content = gm.curStatus.GetBao();
             LiDist.Content = gm.curStatus.GetBao(true);
 
-            aiStaticGrid.DataContext = gm.getStatic();
         }
 
-        public void RefreshAIUI(string text)
+        public void RefreshAIUI()
         {
             PaiListView.ItemsSource = gm.yama;
-            aiTextBlock.Text = text;
+            //aiTextBlock.Text = text;
             WindListView.ItemsSource = gm.history;
+
+            aiStaticGrid1.DataContext = null;
+            aiStaticGrid1.DataContext = gm.getStatic();
+            aiStaticGrid2.DataContext = null;
+            aiStaticGrid2.DataContext = gm.getStatic(1);
+            aiStaticGrid3.DataContext = null;
+            aiStaticGrid3.DataContext = gm.getStatic(2);
+            aiStaticGrid4.DataContext = null;
+            aiStaticGrid4.DataContext = gm.getStatic(3);
+
+        }
+
+        public void Pause()
+        {
+            aithread.Suspend();
         }
 
         /// <summary>
@@ -154,9 +168,9 @@ namespace AlphaSoul
         /// </summary>
         private void MenuItem_Click_1(object sender, RoutedEventArgs e)
         {
-            gm = new Game(this);
             YamaInit();
-            aithread = new Thread(gm.NewGame);
+            //aithread = new Thread(gm.NewGame);
+            aithread = new Thread(gm.LoopGame);
             aithread.Start();
         }
 
@@ -167,31 +181,10 @@ namespace AlphaSoul
 
         private void MenuItem_Click_3(object sender, RoutedEventArgs e)
         {
-            //if(gm == null)
-            //{
-            //    MenuItem_Click_1(null, null);
-            //}
-            //gm.Next();
-            //RefreshUI();
-            //RefreshGameUI();
+            aithread.Resume();
         }
 
-        // 手牌统计
-        private Dictionary<char,int[]> CountPai(List<Pai> plist)
-        {
-            Dictionary<char, int[]>  paiCount = new Dictionary<char, int[]>();
-            paiCount.Add('m', new int[10]);
-            paiCount.Add('p', new int[10]);
-            paiCount.Add('s', new int[10]);
-            paiCount.Add('z', new int[8]);
-            foreach (Pai p in plist)
-            {
-                // 红宝计算2次
-                if (p.num == 0) paiCount[p.type][5] += 1;
-                paiCount[p.type][p.num] += 1;
-            }
-            return paiCount;
-        }
+
 
     }
 }

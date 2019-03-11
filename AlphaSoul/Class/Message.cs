@@ -13,10 +13,13 @@ namespace AlphaSoul
     {
         public Pai mopai;
 
-        // 如果立直后 不允许玩家切牌
+        // 立直后 不允许玩家切牌
         public bool lizhi_stat = false;
 
+        //是否可以立直
         public bool lizhi = false;
+        public List<string> lizhipai = new List<string>();
+
         public bool zimo = false;
         public bool liuju = false;
 
@@ -33,7 +36,7 @@ namespace AlphaSoul
     /// <summary>
     /// 发送给玩家流局消息
     /// </summary>
-    class LiujuMessage
+    public class LiujuMessage
     {
         /// <summary>
         /// 流局理由 0"九种" 1"四风" 2"四杠" 3"荒牌"
@@ -47,6 +50,9 @@ namespace AlphaSoul
         public int[] fenpei = new int[4];
         // 4家是否立直
         public bool[] lizhi = new bool[4];
+
+        public bool flag_li = false;
+        public bool flag_fu = false;
 
         private static string[] typeStr = new string[] { "九种九牌", "四风连打", "四杠散了", "荒牌流局" };
 
@@ -84,17 +90,60 @@ namespace AlphaSoul
     /// <summary>
     /// 发送给玩家 局（风）结束消息
     /// </summary>
-    class EndMessage
+    public class EndMessage
     {
         // 当前的参数
         public PtParam param;
-        // 是否胡牌
+
+        /// <summary>
+        /// 胡牌结果(空则未胡)
+        /// </summary>
         public PtResult res;
-        // 玩家手牌
+
+        /// <summary>
+        /// 是否放铳
+        /// </summary>
+        public bool flag_chong;
+        /// <summary>
+        /// 是否自摸
+        /// </summary>
+        public bool flag_zimo;
+
+        /// <summary>
+        /// 是否立直
+        /// </summary>
+        public bool flag_lizhi;
+
+        /// <summary>
+        /// 是否副露
+        /// </summary>
+        public bool flag_fu;
+
+        /// <summary>
+        /// 和了巡数
+        /// </summary>
+        public int xunshu;
 
         public EndMessage(PtParam param)
         {
             this.param = param;
+        }
+    }
+
+    /// <summary>
+    /// 发送给玩家 半庄结束
+    /// </summary>
+    public class ZhongMessage
+    {
+        public int pt;
+        public int rank;
+        public int maxzhuang;
+
+        public ZhongMessage(int a, int b, int c)
+        {
+            pt = a;
+            rank = b;
+            maxzhuang = c;
         }
     }
 
@@ -107,9 +156,10 @@ namespace AlphaSoul
     /// </summary>
     class QiepaiMessage
     {
-        // 切出的牌
+        // 切出（立直）的牌
         public Pai qiepai;
         public int from;
+        public bool lizhi = false;
 
         public QiepaiMessage(Pai a, int b)
         {
@@ -150,6 +200,20 @@ namespace AlphaSoul
         {
             this.gangpai = gp;
             this.type = type;
+        }
+    }
+
+    class LizhiMessage
+    {
+        // 玩家选择立直的牌
+        public Pai lipai;
+        // 来自的ai编号
+        public int from;
+
+        public LizhiMessage(Pai gp, int ai)
+        {
+            this.lipai = gp;
+            this.from = ai;
         }
     }
 

@@ -10,6 +10,7 @@ namespace AlphaSoul
     {
         public string wind { get; set; }
         public string res { get; set; }
+        public int zhuang { get; set; }
         public int[] pt { get; set; }
 
         public GameHistory()

@@ -30,10 +30,11 @@ namespace AlphaSoul
         private List<Pai> handStack;
         // 个人展露堆（含暗杠）
         private List<string> fuluStack;
+
         // 是否立直过
-        private bool flag_li;
+        //private bool flag_li;
         // 是否副露过
-        private bool flag_fu;
+        //private bool flag_fu;
 
         // ai统计信息
         public AIStatic ailog;
@@ -69,12 +70,12 @@ namespace AlphaSoul
         {
             // AI消息接收层与返回策略
             if (type == "zimo") return zimo(data);
-            else if (type == "fulou") return dapai(data);
+            else if (type == "fulu") return fulu(data);
             else if (type == "gang") return gang(data);
             else if (type == "gangzimo") return zimo(data);
             else if (type == "hule") hule(data);
             else if (type == "liuju") liuju(data);
-            else if (type == "jieju") jieju(data);
+            else if (type == "zhongju") zhongju(data);
             return new object();
         }
 
@@ -91,11 +92,11 @@ namespace AlphaSoul
                 // 能胡牌就胡
                 return new HuMessage(msg.mopai, ai_id);
             }
-            // 杠
+            // 暗加杠
             if (msg.gang)
             {
                 // 选择杠牌
-                return new GangMessage(msg.mopai,1);
+                return new GangMessage(msg.mopai, ai_id);
             }
             if (msg.lizhi_stat)
             {
@@ -136,20 +137,23 @@ namespace AlphaSoul
                     dapai = p;
                 }
             }
-            // 直接摸切
+
+            // 是否立直摸切
             handStack.Remove(dapai);
-            return new QiepaiMessage(dapai, ai_id);
+            QiepaiMessage qm = new QiepaiMessage(dapai, ai_id);
+            qm.lizhi = msg.lizhi;
+            return qm;
 
         }
 
         /// <summary>
         /// 他家丢牌时策略
         /// </summary>
-        private object dapai(object data)
+        private object fulu(object data)
         {
             //和了
             FuluMessage msg = (FuluMessage)data;
-            if(msg.hu == true)
+            if(msg.hu)
             {
                 return new HuMessage(msg.dapai, ai_id);
             }
@@ -170,9 +174,8 @@ namespace AlphaSoul
         /// </summary>
         private void hule(object data)
         {
-            EndMessage emsg = (EndMessage)data;
             // 统计工作
-            ailog.Update(emsg.res, flag_fu, flag_li);
+            ailog.Update((EndMessage)data);
         }
 
         /// <summary>
@@ -180,17 +183,17 @@ namespace AlphaSoul
         /// </summary>
         private void liuju(object data)
         {
-            LiujuMessage lmsg = (LiujuMessage)data;
             // 统计工作
-            ailog.Update(flag_fu, flag_li);
+            ailog.Update((LiujuMessage)data);
         }
 
         /// <summary>
-        /// 南风结束
+        /// 半庄结束
         /// </summary>
-        private void jieju(object data)
+        private void zhongju(object data)
         {
             // 统计工作
+            ailog.EndPlay((ZhongMessage)data);
         }
 
 

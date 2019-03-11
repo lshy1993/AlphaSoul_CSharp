@@ -55,38 +55,48 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AIStatic.cs" />
-    <Compile Include="GameHistory.cs" />
-    <Compile Include="GameStatus.cs" />
-    <Compile Include="Message.cs" />
-    <Compile Include="PaiMaker.cs" />
-    <Compile Include="PtJudger.cs" />
-    <Compile Include="RonJudger.cs" />
-    <Compile Include="TingJudger.cs" />
-    <Compile Include="ToolWindow.xaml.cs">
+    <Compile Include="Class\AIStatic.cs" />
+    <Compile Include="Viewer\AIStaticBox.xaml.cs">
+      <DependentUpon>AIStaticBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Class\GameHistory.cs" />
+    <Compile Include="Class\GameStatus.cs" />
+    <Compile Include="Class\Message.cs" />
+    <Compile Include="Class\PaiMaker.cs" />
+    <Compile Include="Class\PtJudger.cs" />
+    <Compile Include="Class\PtParam.cs" />
+    <Compile Include="Class\PtResult.cs" />
+    <Compile Include="Class\RonJudger.cs" />
+    <Compile Include="Class\TingJudger.cs" />
+    <Compile Include="Viewer\ToolWindow.xaml.cs">
       <DependentUpon>ToolWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="MainWindow.xaml">
+    <Compile Include="Class\Yaku.cs" />
+    <Page Include="Viewer\AIStaticBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Viewer\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="AI.cs" />
+    <Compile Include="Class\AI.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Game.cs" />
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="Class\Game.cs" />
+    <Compile Include="Viewer\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="ToolWindow.xaml">
+    <Page Include="Viewer\ToolWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Pai.cs" />
+    <Compile Include="Class\Pai.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
