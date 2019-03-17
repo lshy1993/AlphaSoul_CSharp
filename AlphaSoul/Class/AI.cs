@@ -6,30 +6,30 @@ using System.Threading.Tasks;
 
 namespace AlphaSoul
 {
-    class AI_Core
+    public class AI_Core
     {
         public int ai_id;
         // 庄家位置
-        private int qinjia;
+        public int qinjia;
         // 场风
-        private int zhuangfeng;
+        public int zhuangfeng;
         // 自风
-        private int zifeng;
+        public int zifeng;
         // 局数
-        private int jushu;
+        public int jushu;
         // 储存场棒
-        private int changbang;
+        public int changbang;
         // 储存立直棒
-        private int lizhibang;
+        public int lizhibang;
         // 4家分数
-        private int[] score;
+        public int[] score;
         // 宝牌
-        private List<string> bao;
+        public List<string> bao;
 
         // 个人手牌堆
-        private List<Pai> handStack;
+        public List<Pai> handStack;
         // 个人展露堆（含暗杠）
-        private List<string> fuluStack;
+        public List<string> fuluStack;
 
         // 是否立直过
         //private bool flag_li;
@@ -37,6 +37,7 @@ namespace AlphaSoul
         //private bool flag_fu;
 
         // ai统计信息
+        [Newtonsoft.Json.JsonIgnore()]
         public AIStatic ailog;
 
         public AI_Core(int id)

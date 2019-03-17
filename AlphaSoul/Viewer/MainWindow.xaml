@@ -9,8 +9,10 @@
         Loaded="Window_Loaded">
     <DockPanel>
         <Menu DockPanel.Dock="Top" >
-            <MenuItem Header="小工具" Click="MenuItem_Click" Height="25" />
-            <MenuItem Header="开始对局" Click="MenuItem_Click_1" Height="25" />
+            <MenuItem Header="小工具" Click="Tool_Click" Height="25" />
+            <MenuItem Header="Listening" Click="ServerListen_Click" Height="25"/>
+            <MenuItem Header="Stop" Click="ServerStop_Click" Height="25"/>
+            <MenuItem Header="开始对局" Click="GameStart_Click" Height="25" />
             <MenuItem Header="停止对局" Click="MenuItem_Click_2" Height="25"/>
             <MenuItem Header="下一步" Click="MenuItem_Click_3" Height="25" />
         </Menu>
@@ -105,7 +107,12 @@
             </StackPanel>
         </Canvas>
         <DockPanel>
-            <ScrollViewer DockPanel.Dock="Bottom">
+            <TabControl DockPanel.Dock="Bottom">
+                <TabItem Header="socket">
+                    <local:MajServer x:Name="serverPage"/>
+                </TabItem>
+                <TabItem Header="status">
+                    <ScrollViewer>
             <StackPanel>
                 <Label>AI 0 统计信息</Label>
                     <local:AIStaticBox x:Name="aiStaticGrid1">
@@ -133,6 +140,9 @@
                     </local:AIStaticBox>
                 </StackPanel>
             </ScrollViewer>
+                </TabItem>
+            </TabControl>
+            
         </DockPanel>
     </DockPanel>
 </Window>

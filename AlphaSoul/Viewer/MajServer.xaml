@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="AlphaSoul.MajServer"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AlphaSoul"
+        mc:Ignorable="d"
+        d:DesignHeight="450" d:DesignWidth="800">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Bottom">
+            <TextBlock x:Name="UserNum">2222</TextBlock>
+        </StackPanel>
+        <ListView x:Name="PacksList">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Time" Width="100" DisplayMemberBinding="{Binding Path=time}"/>
+                    <GridViewColumn Header="Client" Width="50" DisplayMemberBinding="{Binding Path=from}"/>
+                    <GridViewColumn Header="Text" Width="200" DisplayMemberBinding="{Binding Path=text}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </DockPanel>
+</UserControl>

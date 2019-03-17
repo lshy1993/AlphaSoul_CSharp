@@ -23,18 +23,21 @@ namespace AlphaSoul
     public partial class MainWindow : Window
     {
         private Game gm;
-        private Thread aithread;
+        private GameServer mainServer;
+        private Thread aithread, mainThread;
         string[] windStr = new string[4] { "东", "南", "西", "北" };
 
         public MainWindow()
         {
             InitializeComponent();
+            
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             //YamaInit();
-            gm = new Game(this);
+            mainServer = new GameServer(this);
+            gm = new Game(this, mainServer);
         }
 
         private void YamaInit()
@@ -158,7 +161,7 @@ namespace AlphaSoul
         /// <summary>
         /// 打开工具窗口
         /// </summary>
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void Tool_Click(object sender, RoutedEventArgs e)
         {
             //YamaInit();
         }
@@ -166,16 +169,22 @@ namespace AlphaSoul
         /// <summary>
         /// 开始对局
         /// </summary>
-        private void MenuItem_Click_1(object sender, RoutedEventArgs e)
+        private void GameStart_Click(object sender, RoutedEventArgs e)
         {
+            if (mainServer.allsockets.Count() != 4)
+            {
+                mainServer.Log(0, "ai未连接！");
+                return;
+            };
             YamaInit();
-            //aithread = new Thread(gm.NewGame);
-            aithread = new Thread(gm.LoopGame);
+            //aithread = new Thread(gm.LoopGame);
+            aithread = new Thread(gm.NewGame);
             aithread.Start();
         }
 
         private void MenuItem_Click_2(object sender, RoutedEventArgs e)
         {
+            if (aithread == null) return;
             aithread.Abort();
         }
 
@@ -184,7 +193,20 @@ namespace AlphaSoul
             aithread.Resume();
         }
 
+        private void ServerListen_Click(object sender, RoutedEventArgs e)
+        {
+            if (mainThread != null) return;
+            mainThread = new Thread(mainServer.Start);
+            mainThread.Start();
+        }
 
+        private void ServerStop_Click(object sender, RoutedEventArgs e)
+        {
+            if (mainThread == null) return;
+            mainServer.Log(0, "Abort!");
+            mainServer.End();
+            mainThread.Abort();
+        }
 
     }
 }

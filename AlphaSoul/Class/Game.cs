@@ -39,13 +39,15 @@ namespace AlphaSoul
         public GameStatus curStatus;
         // 历史对局
         public ObservableCollection<GameHistory> history = new ObservableCollection<GameHistory>();
-
+     
         private AI_Core[] player;
+        private GameServer server;
 
-        public Game(MainWindow mw)
+        public Game(MainWindow mw, GameServer server)
         {
             yama = PaiMaker.ShufflePai();
             this.mw = mw;
+            this.server = server;
             for (int p = 0; p < 4; p++)
             {
                 PaiStack[p] = new List<Pai>();
@@ -182,7 +184,10 @@ namespace AlphaSoul
             {
                 player[playerid].InitStatus(curStatus);
                 player[playerid].InitStack(PaiStack[playerid]);
+                server.InitStatus(playerid, player[playerid]);
+                //server.InitStack(playerid, PaiStack[playerid]);
             }
+
             // 自动牌局 东风起手
             curWind = 0;
             bool endSection = false;
@@ -192,7 +197,7 @@ namespace AlphaSoul
             while (!endSection)
             {
                 // ui显示
-                //FreshUI(1500);
+                FreshUI(1500);
                 // 处理player的回应
                 if (callback == null)
                 {
