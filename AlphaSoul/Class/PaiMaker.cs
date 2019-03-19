@@ -105,6 +105,16 @@ namespace AlphaSoul
             return codeStr;
         }
 
+        public static List<string> GetCodeList(List<Pai> plist)
+        {
+            List<string> codeStr = new List<string>();
+            foreach (Pai p in plist)
+            {
+                codeStr.Add(p.code);
+            }
+            return codeStr;
+        }
+
         /// <summary>
         /// 获取牌面
         /// </summary>

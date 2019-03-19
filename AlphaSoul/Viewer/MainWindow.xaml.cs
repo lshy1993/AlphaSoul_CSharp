@@ -171,7 +171,7 @@ namespace AlphaSoul
         /// </summary>
         private void GameStart_Click(object sender, RoutedEventArgs e)
         {
-            if (mainServer.allsockets.Count() != 4)
+            if (mainServer.allsockets.Count() == 0)
             {
                 mainServer.Log(0, "ai未连接！");
                 return;
@@ -203,8 +203,8 @@ namespace AlphaSoul
         private void ServerStop_Click(object sender, RoutedEventArgs e)
         {
             if (mainThread == null) return;
-            mainServer.Log(0, "Abort!");
             mainServer.End();
+            mainServer.Log(0, "Abort!");
             mainThread.Abort();
         }
 

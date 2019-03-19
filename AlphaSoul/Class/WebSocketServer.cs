@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Threading;
 using Fleck;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace AlphaSoul
 {
@@ -31,6 +32,11 @@ namespace AlphaSoul
         private List<WebPacket> packs;
         public List<IWebSocketConnection> allsockets;
         private IWebSocketServer server;
+
+        private bool zimoRes = false;
+        // 返回类型
+        private JObject resObj;
+
 
         public GameServer(MainWindow window)
         {
@@ -60,6 +66,15 @@ namespace AlphaSoul
                 {
                     int clientPort = socket.ConnectionInfo.ClientPort;
                     Log(clientPort, string.Format("{0}:{1}", clientPort, message));
+                    try
+                    {
+                        resObj = JObject.Parse(message);
+                    }
+                    catch
+                    {
+                        resObj = null;
+                    }
+                    
                 };
             });
 
@@ -79,7 +94,16 @@ namespace AlphaSoul
             allsockets[id].Send(jsondata);
         }
 
-
+        public JObject GetZimoRes(int id, string jsondata)
+        {
+            resObj = null;
+            allsockets[id].Send(jsondata);
+            while (resObj == null)
+            {
+                //等待回应
+            }
+            return resObj;
+        }
 
 
 
@@ -98,10 +122,12 @@ namespace AlphaSoul
         }
 
 
-        internal void End()
+        public void End()
         {
             foreach (var client in allsockets)
+            {
                 client.Close();
+            }
             server.Dispose();
         }
     }

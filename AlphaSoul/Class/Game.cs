@@ -41,13 +41,13 @@ namespace AlphaSoul
         public ObservableCollection<GameHistory> history = new ObservableCollection<GameHistory>();
      
         private AI_Core[] player;
-        private GameServer server;
+        //private GameServer server;
 
         public Game(MainWindow mw, GameServer server)
         {
             yama = PaiMaker.ShufflePai();
             this.mw = mw;
-            this.server = server;
+            //this.server = server;
             for (int p = 0; p < 4; p++)
             {
                 PaiStack[p] = new List<Pai>();
@@ -56,7 +56,7 @@ namespace AlphaSoul
                 Fulu[p] = new List<string>();
             }
             // 四个AI
-            player = new AI_Core[4] { new AI_Core(0), new AI_Core(1), new AI_Core(2), new AI_Core(3) };
+            player = new AI_Core[4] { new AI_Core(0,server), new AI_Core(1), new AI_Core(2), new AI_Core(3) };
         }
 
         public void LoopGame()
@@ -184,8 +184,6 @@ namespace AlphaSoul
             {
                 player[playerid].InitStatus(curStatus);
                 player[playerid].InitStack(PaiStack[playerid]);
-                server.InitStatus(playerid, player[playerid]);
-                //server.InitStack(playerid, PaiStack[playerid]);
             }
 
             // 自动牌局 东风起手
@@ -197,7 +195,7 @@ namespace AlphaSoul
             while (!endSection)
             {
                 // ui显示
-                FreshUI(1500);
+                FreshUI(500);
                 // 处理player的回应
                 if (callback == null)
                 {
@@ -229,7 +227,16 @@ namespace AlphaSoul
                     // 玩家切牌
                     QiepaiMessage qm = (QiepaiMessage)callback;
                     int playerid = qm.from;
-                    Pai dapai = qm.qiepai;
+                    Pai dapai = null;// qm.qiepai;
+                    foreach(Pai p in PaiStack[playerid])
+                    {
+                        if(p.code == qm.qiepai)
+                        {
+                            dapai = p;
+                            //PaiStack[playerid].Remove(p);
+                            break;
+                        }
+                    }
                     PaiStack[playerid].Remove(dapai);
                     // 收到立直信号
                     if (qm.lizhi)

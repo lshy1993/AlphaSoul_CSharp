@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,7 +29,9 @@ namespace AlphaSoul
         public List<string> bao;
 
         // 个人手牌堆
-        public List<Pai> handStack;
+        private List<Pai> handStack;
+
+        public List<string> _handStack;
         // 个人展露堆（含暗杠）
         public List<string> fuluStack;
 
@@ -40,11 +44,14 @@ namespace AlphaSoul
         [Newtonsoft.Json.JsonIgnore()]
         public AIStatic ailog;
 
-        public AI_Core(int id)
+        private GameServer server;
+
+        public AI_Core(int id, GameServer server = null)
         {
             ai_id = id;
             fuluStack = new List<string>();
             ailog = new AIStatic();
+            this.server = server;
         }
 
         // 设置该局信息
@@ -64,12 +71,21 @@ namespace AlphaSoul
         public void InitStack(List<Pai> shoupai)
         {
             handStack = new List<Pai>(shoupai);
+            _handStack = PaiMaker.GetCodeList(shoupai);
             fuluStack.Clear();
+            if(server != null)
+            {
+                server.InitStatus(ai_id, this);
+            }
         }
 
         public object Action(string type, object data)
         {
             // AI消息接收层与返回策略
+            if (server != null)
+            {
+                return SocketAction(type, data);
+            }
             if (type == "zimo") return zimo(data);
             else if (type == "fulu") return fulu(data);
             else if (type == "gang") return gang(data);
@@ -80,6 +96,39 @@ namespace AlphaSoul
             return new object();
         }
 
+        public object SocketAction(string type, object data)
+        {
+            if (type == "zimo")
+            {
+                MopaiMessage msg = (MopaiMessage)data;
+                string jsondata = JsonConvert.SerializeObject(msg);
+                JObject resObj = server.GetZimoRes(ai_id, jsondata);
+                if (resObj["type"].ToString() == "zimo")
+                {
+                    return new HuMessage(msg.mopai, ai_id);
+                }
+                // 暗加杠
+                if (resObj["type"].ToString() == "gang")
+                {
+                    // 选择杠牌
+                    return new GangMessage(msg.mopai, ai_id);
+                }
+                // 流局
+                if (resObj["type"].ToString() == "liuju")
+                {
+                    return new LiujuMessage(handStack);
+                }
+                // 切牌
+                if (resObj["type"].ToString() == "qiepai")
+                {
+                    string pai = resObj["dapai"].ToString();
+                    QiepaiMessage qm = new QiepaiMessage(pai, ai_id);
+                    qm.lizhi = resObj["lizhi"].ToObject<bool>();
+                    return qm;
+                }
+            }
+            return new object();
+        }
 
         /// <summary>
         /// 摸牌时策略选择
@@ -102,7 +151,7 @@ namespace AlphaSoul
             if (msg.lizhi_stat)
             {
                 // 立直只允许摸切
-                return new QiepaiMessage(msg.mopai, ai_id);
+                return new QiepaiMessage(msg.mopai.code, ai_id);
             }
             // 流局
             if (msg.liuju)
@@ -141,7 +190,7 @@ namespace AlphaSoul
 
             // 是否立直摸切
             handStack.Remove(dapai);
-            QiepaiMessage qm = new QiepaiMessage(dapai, ai_id);
+            QiepaiMessage qm = new QiepaiMessage(dapai.code, ai_id);
             qm.lizhi = msg.lizhi;
             return qm;
 

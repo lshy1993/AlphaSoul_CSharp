@@ -157,11 +157,11 @@ namespace AlphaSoul
     class QiepaiMessage
     {
         // 切出（立直）的牌
-        public Pai qiepai;
+        public string qiepai;
         public int from;
         public bool lizhi = false;
 
-        public QiepaiMessage(Pai a, int b)
+        public QiepaiMessage(string a, int b)
         {
             qiepai = a;
             from = b;
