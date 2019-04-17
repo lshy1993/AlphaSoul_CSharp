@@ -14,7 +14,7 @@
             <MenuItem Header="Stop" Click="ServerStop_Click" Height="25"/>
             <MenuItem Header="开始对局" Click="GameStart_Click" Height="25" />
             <MenuItem Header="停止对局" Click="MenuItem_Click_2" Height="25"/>
-            <MenuItem Header="下一步" Click="MenuItem_Click_3" Height="25" />
+            <MenuItem Header="大量训练" Click="MenuItem_Click_3" Height="25" />
         </Menu>
         <DockPanel Width="300" DockPanel.Dock="Left">
             <Label DockPanel.Dock="Top" Height="25">牌山</Label>

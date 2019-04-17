@@ -195,7 +195,7 @@ namespace AlphaSoul
             while (!endSection)
             {
                 // ui显示
-                FreshUI(500);
+                //FreshUI(500);
                 // 处理player的回应
                 if (callback == null)
                 {
@@ -249,9 +249,7 @@ namespace AlphaSoul
 
                     // 如果有玩家可以副露 则发送消息
                     List<HuMessage> mlist_hu = new List<HuMessage>();
-                    List<GangMessage> mlist_gang = new List<GangMessage>();
-                    List<PengMessage> mlist_peng = new List<PengMessage>();
-                    List<ChiMessage> mlist_chi = new List<ChiMessage>();
+                    List<FuluMessage> mlist_fulu = new List<FuluMessage>();
                     foreach (int id in curStatus.playerWind)
                     {
                         object subcallback = null;
@@ -265,17 +263,9 @@ namespace AlphaSoul
                         {
                             mlist_hu.Add((HuMessage)subcallback);
                         }
-                        else if (subcallback.GetType() == typeof(GangMessage))
+                        else if (subcallback.GetType() == typeof(FuluMessage))
                         {
-                            mlist_gang.Add((GangMessage)subcallback);
-                        }
-                        else if (subcallback.GetType() == typeof(PengMessage))
-                        {
-                            mlist_peng.Add((PengMessage)subcallback);
-                        }
-                        else if (subcallback.GetType() == typeof(ChiMessage))
-                        {
-                            mlist_chi.Add((ChiMessage)subcallback);
+                            mlist_fulu.Add((FuluMessage)subcallback);
                         }
                     }
                     // 判定优先级 胡>碰>吃
@@ -293,20 +283,17 @@ namespace AlphaSoul
                             curStatus.lizhibang++;
                         }
 
-                        if (mlist_gang.Count == 1)
+                        if (mlist_fulu.Count > 0)
                         {
-                            // 明杠
+                            // 明杠 // 碰 // 吃
                             curStatus.diyizimo = new bool[] { false, false, false, false };
-                        }
-                        else if (mlist_peng.Count == 1)
-                        {
-                            // 碰
-                            curStatus.diyizimo = new bool[] { false, false, false, false };
-                        }
-                        else if (mlist_chi.Count == 1)
-                        {
-                            // 吃
-                            curStatus.diyizimo = new bool[] { false, false, false, false };
+                            foreach(var subcall in mlist_fulu)
+                            {
+                                //if(subcall)
+                            }
+                            // 判定优先度后
+                            // 执行操作
+                            // 发送副露消息
                         }
                         else
                         {
@@ -371,17 +358,18 @@ namespace AlphaSoul
                     }));
                     endSection = true;
                 }
-                else if (callback.GetType() == typeof(GangMessage))
+                else if (callback.GetType() == typeof(FuluMessage))
                 {
-                    GangMessage gmsg = (GangMessage)callback;
+                    FuluMessage gmsg = (FuluMessage)callback;
                     int aid = gmsg.from;
+                    int type = gmsg.fulu[0].type;
                     // 玩家自己 暗杠 加杠
-                    if (gmsg.type == 2)
+                    if (type == 2)
                     {
                         // 暗杠 只有国士可以抢
 
                     }
-                    else if (gmsg.type == 1)
+                    else if (type == 1)
                     {
                         // 明杠 加杠 需要判定抢杠
                     }
@@ -644,16 +632,8 @@ namespace AlphaSoul
                 msg.hu = true;
             }
             // 立直状态不能吃碰
-            //if (curStatus.playerParam[aid].lizhi > 0) return msg;
             if (curStatus.lizhi[aid] > 0) return msg;
-            if (false)
-            {
-                msg.pen = true;
-            }
-            if (false)
-            {
-                msg.chi = true;
-            }
+            msg.fulu = FuluMaker.GetFuluMianzi(PaiStack[aid], Fulu[aid], mopai);
             return msg;
         }
 

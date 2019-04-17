@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace AlphaSoul
 {
@@ -11,7 +13,9 @@ namespace AlphaSoul
     /// </summary>
     class MopaiMessage
     {
+        [Newtonsoft.Json.JsonIgnore()]
         public Pai mopai;
+        public string tile;
 
         // 立直后 不允许玩家切牌
         public bool lizhi_stat = false;
@@ -30,6 +34,12 @@ namespace AlphaSoul
         public MopaiMessage(Pai p)
         {
             mopai = p;
+            tile = p.code;
+        }
+
+        public string ToJsonData()
+        {
+            return JsonConvert.SerializeObject(this);
         }
     }
 
@@ -76,14 +86,18 @@ namespace AlphaSoul
     class FuluMessage
     {
         public Pai dapai;
+        public List<FuluMianzi> fulu;
         public bool hu = false;
-        public bool chi = false;
-        public bool pen = false;
-        public bool gang = false;
+        public int from;
 
         public FuluMessage(Pai p)
         {
             dapai = p;
+        }
+        public FuluMessage(Pai p, int from)
+        {
+            dapai = p;
+            this.from = from;
         }
     }
 
@@ -187,21 +201,22 @@ namespace AlphaSoul
     /// <summary>
     /// 玩家选择 杠牌
     /// </summary>
-    class GangMessage
-    {
-        // 玩家选择开杠的牌
-        public Pai gangpai;
-        // 0暗杠 1明杠 2加杠
-        public int type;
-        // 来自的ai编号
-        public int from;
+    //class FuluBackMessage
+    //{
+    //    // 玩家选择开杠的牌
+    //    public Pai pai;
+    //    // 
+    //    public int type;
+    //    // 来自的ai编号
+    //    public int from;
 
-        public GangMessage(Pai gp, int type)
-        {
-            this.gangpai = gp;
-            this.type = type;
-        }
-    }
+    //    public FuluBackMessage(Pai gp, int type, int from)
+    //    {
+    //        this.pai = gp;
+    //        this.type = type;
+    //        this.from = from;
+    //    }
+    //}
 
     class LizhiMessage
     {
@@ -220,18 +235,18 @@ namespace AlphaSoul
     /// <summary>
     /// 玩家选择碰
     /// </summary>
-    class PengMessage
-    {
+    //class PengMessage
+    //{
 
-    }
+    //}
 
     /// <summary>
     /// 玩家选择吃
     /// </summary>
-    class ChiMessage
-    {
+    //class ChiMessage
+    //{
 
-    }
+    //}
 
     /// <summary>
     /// 玩家选择9种流局

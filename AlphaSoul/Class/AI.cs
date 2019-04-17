@@ -73,7 +73,7 @@ namespace AlphaSoul
             handStack = new List<Pai>(shoupai);
             _handStack = PaiMaker.GetCodeList(shoupai);
             fuluStack.Clear();
-            if(server != null)
+            if(server != null && server.allsockets.Count != 0)
             {
                 server.InitStatus(ai_id, this);
             }
@@ -82,7 +82,7 @@ namespace AlphaSoul
         public object Action(string type, object data)
         {
             // AI消息接收层与返回策略
-            if (server != null)
+            if (server != null && server.allsockets.Count != 0)
             {
                 return SocketAction(type, data);
             }
@@ -101,8 +101,7 @@ namespace AlphaSoul
             if (type == "zimo")
             {
                 MopaiMessage msg = (MopaiMessage)data;
-                string jsondata = JsonConvert.SerializeObject(msg);
-                JObject resObj = server.GetZimoRes(ai_id, jsondata);
+                JObject resObj = server.GetZimoRes(ai_id, msg.ToJsonData());
                 if (resObj["type"].ToString() == "zimo")
                 {
                     return new HuMessage(msg.mopai, ai_id);
@@ -111,7 +110,7 @@ namespace AlphaSoul
                 if (resObj["type"].ToString() == "gang")
                 {
                     // 选择杠牌
-                    return new GangMessage(msg.mopai, ai_id);
+                    return new FuluMessage(msg.mopai, ai_id);
                 }
                 // 流局
                 if (resObj["type"].ToString() == "liuju")
@@ -127,6 +126,12 @@ namespace AlphaSoul
                     return qm;
                 }
             }
+            else if (type == "hule")
+            {
+                hule(data);
+            }
+            else if (type == "liuju") liuju(data);
+            else if (type == "zhongju") zhongju(data);
             return new object();
         }
 
@@ -146,7 +151,7 @@ namespace AlphaSoul
             if (msg.gang)
             {
                 // 选择杠牌
-                return new GangMessage(msg.mopai, ai_id);
+                return new FuluMessage(msg.mopai, ai_id);
             }
             if (msg.lizhi_stat)
             {
@@ -203,11 +208,16 @@ namespace AlphaSoul
         {
             //和了
             FuluMessage msg = (FuluMessage)data;
-            if(msg.hu)
+            if (msg.hu)
             {
                 return new HuMessage(msg.dapai, ai_id);
             }
             //副露
+            else if (msg.fulu != null && msg.fulu.Count  != 0)
+            {
+                // TODO: ai副露选择
+
+            }
             return new object();
         }
 

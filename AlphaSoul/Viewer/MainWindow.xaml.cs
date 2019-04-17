@@ -174,7 +174,7 @@ namespace AlphaSoul
             if (mainServer.allsockets.Count() == 0)
             {
                 mainServer.Log(0, "ai未连接！");
-                return;
+                //return;
             };
             YamaInit();
             //aithread = new Thread(gm.LoopGame);
@@ -190,7 +190,9 @@ namespace AlphaSoul
 
         private void MenuItem_Click_3(object sender, RoutedEventArgs e)
         {
-            aithread.Resume();
+            //aithread.Resume();
+            aithread = new Thread(gm.LoopGame);
+            aithread.Start();
         }
 
         private void ServerListen_Click(object sender, RoutedEventArgs e)
