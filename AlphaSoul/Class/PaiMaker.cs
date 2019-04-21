@@ -128,5 +128,69 @@ namespace AlphaSoul
             }
             return codeStr;
         }
+
+
+        // 计算副露后的统计
+        public static List<Pai> GetFuluOff(List<Pai>plist, FuluMianzi mianzi)
+        {
+            var newHand = new List<Pai>(plist);
+            var mz = new List<string>();
+            if (mianzi.type == 6)
+            {
+                // 加杠牌
+                mz.Add(mianzi.combination.Split('|')[1]);
+            }
+            else
+            {
+                foreach(string str in mianzi.combination.Split('|'))
+                {
+                    mz.Add(str);
+                }
+            }
+            foreach (var p in mz)
+            {
+                foreach(Pai hd in newHand)
+                {
+                    if (hd.code == p) newHand.Remove(hd);;
+                    break;
+                }
+                
+            }
+            return newHand;
+        }
+
+        // 获得新的副露堆
+        public static List<string> GetFulu(List<string>fulu, FuluMianzi mianzi)
+        {
+            var new_fulu = new List<string>(fulu);
+            if (mianzi.type == 6)
+            {
+                // 加杠
+                var ori = mianzi.combination.Split('|')[0];
+                for(var i=0;i<new_fulu.Count();i++)
+                {
+                    if (new_fulu[i] == ori) new_fulu[i] = FuluCode(mianzi.combination);
+                }
+            }
+            else
+            {
+                new_fulu.Add(FuluCode(mianzi.combination));
+            }
+            return new_fulu;
+        }
+
+        // 获取副露后的代码
+        static string FuluCode(string mianzi)
+        {
+            char ch = ' ';
+            string code = "";
+            foreach (string p in mianzi.Split('|'))
+            {
+                ch = p[1];
+                code += p[0];
+            }
+            return ch + code;
+        }
+
     }
 }

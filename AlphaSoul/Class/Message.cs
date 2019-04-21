@@ -163,7 +163,22 @@ namespace AlphaSoul
 
 
 
-    /* 以下为玩家AI消息 */
+    /* 以下为玩家AI反馈消息 */
+    class ReturnMessage
+    {
+        public Pai tile;
+        public int from;
+        // 1切 2吃 3碰 4暗杠 5明杠 6加杠 7立直 8自摸 9胡 10九种 11拔北
+        public int type;
+        public bool lizhi = false;
+        public string combination;
+
+        public ReturnMessage(int type = -1)
+        {
+            this.type = type;
+        }
+    }
+
 
     /// <summary>
     /// 玩家选择 切牌
@@ -185,15 +200,16 @@ namespace AlphaSoul
     /// <summary>
     /// 玩家选择 胡牌
     /// </summary>
-    class HuMessage
+    class HuMessage : ReturnMessage
     {
-        public Pai rongpai;
-        public int from;
+        //public Pai tile;
+        //public int from;
         //public PtResult res;
 
         public HuMessage(Pai p, int id)
         {
-            rongpai = p;
+            type = 4;
+            tile = p;
             from = id;
         }
     }

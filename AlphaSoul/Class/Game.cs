@@ -23,7 +23,7 @@ namespace AlphaSoul
         public ObservableCollection<Pai>[] River = new ObservableCollection<Pai>[4];
         // 鸣牌区域
         //public ObservableCollection<Pai>[] Fulu = new ObservableCollection<Pai>[4];
-        public List<string>[] Fulu = new List<string>[4];
+        public List<string>[] FuluStack = new List<string>[4];
 
         // 牌山位置指示
         private int yamaPos, yamaLast;
@@ -53,7 +53,7 @@ namespace AlphaSoul
                 PaiStack[p] = new List<Pai>();
                 River[p] = new ObservableCollection<Pai>();
                 //Fulu[p] = new ObservableCollection<Pai>();
-                Fulu[p] = new List<string>();
+                FuluStack[p] = new List<string>();
             }
             // 四个AI
             player = new AI_Core[4] { new AI_Core(0,server), new AI_Core(1), new AI_Core(2), new AI_Core(3) };
@@ -79,8 +79,6 @@ namespace AlphaSoul
             {
                 // 初始化
                 NewWind();
-                // 开始对局
-                PlayWind();
             }
             // 计算pt与排名
             List<PtRank> rank = new List<PtRank>();
@@ -143,7 +141,7 @@ namespace AlphaSoul
             {
                 PaiStack[p].Clear();
                 River[p].Clear();
-                Fulu[p].Clear();
+                FuluStack[p].Clear();
             }
             // 摸4轮牌
             for (int t = 0; t < 4; t++)
@@ -173,19 +171,21 @@ namespace AlphaSoul
 
                 }
             }
-            // ui显示
-            //FreshUI();
-        }
-
-        private void PlayWind()
-        {
             // 发送初始化信息给player
             foreach (int playerid in curStatus.playerWind)
             {
                 player[playerid].InitStatus(curStatus);
                 player[playerid].InitStack(PaiStack[playerid]);
             }
+            // ui显示
+            //FreshUI();
 
+            // 开始对局
+            PlayWind();
+        }
+
+        private void PlayWind()
+        {
             // 自动牌局 东风起手
             curWind = 0;
             bool endSection = false;
@@ -197,21 +197,57 @@ namespace AlphaSoul
                 // ui显示
                 //FreshUI(500);
                 // 处理player的回应
-                if (callback == null)
+                if(callback == null)
                 {
-                    int aid = curStatus.playerWind[curWind];
-                    // 从牌顶 摸牌
-                    yamaPos++;
-                    Pai mo = yama[yamaPos];
-                    yama[yamaPos].stat = curWind + 1;
-                    // 手牌+1
-                    PaiStack[aid].Add(mo);
-                    // 通知生成（暗杠 立直 胡牌 流局）
-                    MopaiMessage mmsg = allow_zimo(aid, mo);
-                    // 向玩家发送消息
-                    callback = player[aid].Action("zimo", mmsg);
-                    // 巡数+1
-                    curStatus.xunshu[aid]++;
+                    // 是否4家立直
+                    if (curStatus.lizhi[0] > 0 && curStatus.lizhi[1] > 0
+                    && curStatus.lizhi[2] > 0 && curStatus.lizhi[3] > 0)
+                    {
+                        // 向所有玩家发送流局（结束）消息
+                        LiujuMessage lj = new LiujuMessage(1);
+                        foreach (int id in curStatus.playerWind)
+                        {
+                            player[id].Action("liuju", lj);
+                        }
+                        GameHistory gg = new GameHistory();
+                        gg.wind = curStatus.GetWind();
+                        gg.zhuang = curStatus.playerWind[0];
+                        gg.res = "4家立直";
+                        gg.pt = lj.fenpei;
+                        mw.Dispatcher.Invoke(new Action(() =>
+                        {
+                            history.Add(gg);
+                        }));
+                        lianzhuang = true;
+                        endSection = true;
+                    }
+                    else if (yamaPos == yamaLast - 14)
+                    {
+                        // 荒牌流局
+                        lianzhuang = Liuju();
+                        endSection = true;
+                    }
+                    else
+                    {
+                        // 轮到下一个风玩家
+                        curWind += 1;
+                        if (curWind > 3) curWind = 0;
+                        int aid = curStatus.playerWind[curWind];
+
+                        // 从牌顶 摸牌
+                        yamaPos++;
+                        Pai mo = yama[yamaPos];
+                        yama[yamaPos].stat = curWind + 1;
+                        // 手牌+1
+                        PaiStack[aid].Add(mo);
+                        // 通知生成（暗杠 立直 胡牌 流局）
+                        MopaiMessage mmsg = allow_zimo(aid, mo);
+                        // 向玩家发送消息等待回复
+                        callback = player[aid].Action("zimo", mmsg);
+
+                        // 巡数+1
+                        curStatus.xunshu[aid]++;
+                    }
                 }
                 else if (callback.GetType() == typeof(HuMessage))
                 {
@@ -226,9 +262,9 @@ namespace AlphaSoul
                 {
                     // 玩家切牌
                     QiepaiMessage qm = (QiepaiMessage)callback;
-                    int playerid = qm.from;
+                    int pid = qm.from;
                     Pai dapai = null;// qm.qiepai;
-                    foreach(Pai p in PaiStack[playerid])
+                    foreach(Pai p in PaiStack[pid])
                     {
                         if(p.code == qm.qiepai)
                         {
@@ -237,38 +273,41 @@ namespace AlphaSoul
                             break;
                         }
                     }
-                    PaiStack[playerid].Remove(dapai);
+                    PaiStack[pid].Remove(dapai);
                     // 收到立直信号
                     if (qm.lizhi)
                     {
-                        //curStatus.playerParam[playerid].lizhi = curStatus.diyizimo[playerid] ? 2 : 1;
-                        curStatus.lizhi[playerid] = curStatus.diyizimo[playerid] ? 2 : 1;
+                        curStatus.lizhi[pid] = curStatus.diyizimo[pid] ? 2 : 1;
                     }
                     // 第一自摸状态结束
-                    if (curStatus.diyizimo[playerid]) curStatus.diyizimo[playerid] = false;
+                    if (curStatus.diyizimo[pid]) curStatus.diyizimo[pid] = false;
 
-                    // 如果有玩家可以副露 则发送消息
+                    // 反馈队列
                     List<HuMessage> mlist_hu = new List<HuMessage>();
-                    List<FuluMessage> mlist_fulu = new List<FuluMessage>();
+                    List<ReturnMessage> mlist_fulu = new List<ReturnMessage>();
                     foreach (int id in curStatus.playerWind)
                     {
-                        object subcallback = null;
-                        if (id != playerid)
+                        // 发送切牌消息
+                        FuluMessage fmsg = allow_fulu(id, pid, dapai);
+                        ReturnMessage rmsg = (ReturnMessage)player[id].Action("fulu", fmsg);
+                        // 判定优先级 胡>碰>吃
+                        if (rmsg.type == -1)
                         {
-                            FuluMessage fmsg = allow_fulu(id, dapai);
-                            subcallback = player[id].Action("fulu", fmsg);
+                            // 玩家取消
+                            continue;
                         }
-                        if (subcallback == null) continue;
-                        if (subcallback.GetType() == typeof(HuMessage))
+                        else if (rmsg.type == 1)
                         {
-                            mlist_hu.Add((HuMessage)subcallback);
+                            // 有玩家胡牌
+                            mlist_hu.Add((HuMessage)rmsg);
                         }
-                        else if (subcallback.GetType() == typeof(FuluMessage))
+                        else
                         {
-                            mlist_fulu.Add((FuluMessage)subcallback);
+                            // 玩家副露
+                            mlist_fulu.Add(rmsg);
                         }
                     }
-                    // 判定优先级 胡>碰>吃
+                    // 优先级处理
                     if (mlist_hu.Count > 0)
                     {
                         lianzhuang = HuLe(mlist_hu);
@@ -279,7 +318,7 @@ namespace AlphaSoul
                         // 立直委托棒
                         if (qm.lizhi)
                         {
-                            curStatus.score[playerid] -= 1000;
+                            curStatus.score[pid] -= 1000;
                             curStatus.lizhibang++;
                         }
 
@@ -287,55 +326,23 @@ namespace AlphaSoul
                         {
                             // 明杠 // 碰 // 吃
                             curStatus.diyizimo = new bool[] { false, false, false, false };
-                            foreach(var subcall in mlist_fulu)
+                            ReturnMessage finalmsg = new ReturnMessage();
+                            // 判定优先度 碰杠>吃
+                            foreach(ReturnMessage subcall in mlist_fulu)
                             {
-                                //if(subcall)
+                                if (subcall.type > finalmsg.type) finalmsg = subcall;
                             }
-                            // 判定优先度后
                             // 执行操作
+                            callback = finalmsg;
                             // 发送副露消息
                         }
                         else
                         {
                             // 无人回应 则弃牌进入牌河
-                            River[playerid].Add(dapai);
-                            dapai.stat = curStatus.zifeng[playerid] + 5;
-                            // 超过第一巡则两立状态取消
+                            River[pid].Add(dapai);
+                            dapai.stat = curStatus.zifeng[pid] + 5;
 
-                            // 4家立直
-                            if (curStatus.lizhi[0] > 0 && curStatus.lizhi[1] > 0
-                            && curStatus.lizhi[2] > 0 && curStatus.lizhi[3] > 0)
-                            {
-                                // 向所有玩家发送流局（结束）消息
-                                LiujuMessage lj = new LiujuMessage(1);
-                                foreach (int id in curStatus.playerWind)
-                                {
-                                    player[id].Action("liuju", lj);
-                                }
-                                GameHistory gg = new GameHistory();
-                                gg.wind = curStatus.GetWind();
-                                gg.zhuang = curStatus.playerWind[0];
-                                gg.res = "4家立直";
-                                gg.pt = lj.fenpei;
-                                mw.Dispatcher.Invoke(new Action(() =>
-                                {
-                                    history.Add(gg);
-                                }));
-                                lianzhuang = true;
-                                endSection = true;
-                            }
-                            else if (yamaPos == yamaLast - 14)
-                            {
-                                lianzhuang = Liuju();
-                                endSection = true;
-                            }
-                            else
-                            {
-                                // 轮到下一个风玩家
-                                curWind += 1;
-                                if (curWind > 3) curWind = 0;
-                                callback = null;
-                            }
+                            callback = null;
                         }
 
                     }
@@ -463,11 +470,11 @@ namespace AlphaSoul
             foreach (HuMessage hm in mlist_hu)
             {
                 int aid = hm.from;
-                chongjia = hm.rongpai.stat - 1;
+                chongjia = hm.tile.stat - 1;
                 // 合计点数
                 List<Pai> npstack = new List<Pai>(PaiStack[aid]);
-                if (npstack.Count == 13) npstack.Add(hm.rongpai);
-                PtResult ptr = new PtJudger().Judge(npstack, hm.rongpai, Fulu[aid], curStatus.getPlayerParam(aid));
+                if (npstack.Count == 13) npstack.Add(hm.tile);
+                PtResult ptr = new PtJudger().Judge(npstack, hm.tile, FuluStack[aid], curStatus.getPlayerParam(aid));
                 serverLog += PaiMaker.GetDisp(npstack)+"\r\n";
                 serverLog += ptr.GetYaku();
                 // 分数加和
@@ -512,7 +519,7 @@ namespace AlphaSoul
                 emsg.flag_chong = (id == chongjia);
                 //emsg.flag_lizhi = curStatus.playerParam[id].lizhi > 0;
                 emsg.flag_lizhi = curStatus.lizhi[id] > 0;
-                emsg.flag_fu = Fulu[id].Count > 0;
+                emsg.flag_fu = FuluStack[id].Count > 0;
                 player[id].Action("hule", emsg);
             }
             mw.Dispatcher.Invoke(new Action(() =>
@@ -540,7 +547,7 @@ namespace AlphaSoul
                 lj.shoupai[i] = PaiMaker.GetCode(PaiStack[pid]);
                 //serverLog += string.Format("{0}: {1}\r\n", i, lj.shoupai[i]);
                 serverLog += string.Format("{0}: {1}\r\n", i, PaiMaker.GetDisp(PaiStack[pid]));
-                ting[pid] = TingJudger.xiangting(PaiMaker.GetCount(PaiStack[pid]), Fulu[pid]) == 0 ? 1 : 0;
+                ting[pid] = TingJudger.xiangting(PaiMaker.GetCount(PaiStack[pid]), FuluStack[pid]) == 0 ? 1 : 0;
             }
             lianzhuang = ting[curStatus.playerWind[0]] == 1;
             // 未听牌点数更新
@@ -583,7 +590,7 @@ namespace AlphaSoul
         {
             // 获取信息
             List<Pai> plist = PaiStack[aid];
-            List<string> fulu = Fulu[aid];
+            List<string> fulu = FuluStack[aid];
             //PtParam param = curStatus.playerParam[aid];
             PtParam param = curStatus.getPlayerParam(aid);
             // 判定可能出现的选项
@@ -616,24 +623,28 @@ namespace AlphaSoul
             return msg;
         }
 
-        private FuluMessage allow_fulu(int aid, Pai mopai)
+        private FuluMessage allow_fulu(int aid, int pid, Pai mopai)
         {
             // 根据玩家id获取信息
-            List<string> fulu = Fulu[aid];
-            //PtParam param = curStatus.playerParam[aid];
+            List<string> fulu = FuluStack[aid];
+            // 生成消息
+            FuluMessage msg = new FuluMessage(mopai);
+
             PtParam param = curStatus.getPlayerParam(aid);
             List<Pai> np = new List<Pai>(PaiStack[aid]);
             np.Add(mopai);
             PtResult ptr = new PtJudger().Judge(np, mopai, fulu, param);
-            // 生成消息
-            FuluMessage msg = new FuluMessage(mopai);
+            
             if(ptr.mianzi != null)
             {
                 msg.hu = true;
             }
+            // 自己不计算副露面
+            if (aid == pid) return msg;
             // 立直状态不能吃碰
             if (curStatus.lizhi[aid] > 0) return msg;
-            msg.fulu = FuluMaker.GetFuluMianzi(PaiStack[aid], Fulu[aid], mopai);
+            // 计算可能副露
+            msg.fulu = FuluMaker.GetFuluMianzi(PaiStack[aid], FuluStack[aid], mopai);
             return msg;
         }
 

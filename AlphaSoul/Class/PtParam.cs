@@ -41,6 +41,11 @@ namespace AlphaSoul
         // 1: 天和, 2: 地和
         public int tianhu;
 
+        public PtParam()
+        {
+
+        }
+
         public PtParam(GameStatus gs, int zi)
         {
             changfeng = gs.changfeng;

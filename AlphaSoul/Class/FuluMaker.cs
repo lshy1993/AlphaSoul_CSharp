@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AlphaSoul
 {
-    class FuluMianzi
+    public class FuluMianzi
     {
         public string combination;
         public int type;

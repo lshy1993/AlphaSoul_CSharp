@@ -64,7 +64,7 @@ namespace AlphaSoul
         /// <summary>
         /// 和了分数判定
         /// </summary>
-        public PtResult Judge(List<Pai> hand, Pai rongpai, List<string> fulu, PtParam param)
+        public static PtResult GetFen(List<Pai> hand, List<string> fulu, Pai rongpai, PtParam param)
         {
             Dictionary<char, int[]> paiCount = PaiMaker.GetCount(hand);
 
