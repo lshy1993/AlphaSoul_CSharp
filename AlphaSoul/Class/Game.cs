@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -195,7 +196,7 @@ namespace AlphaSoul
             while (!endSection)
             {
                 // ui显示
-                //FreshUI(500);
+                FreshUI(100);
                 // 处理player的回应
                 if(callback == null)
                 {
@@ -269,11 +270,11 @@ namespace AlphaSoul
                         if(p.code == qm.qiepai)
                         {
                             dapai = p;
-                            //PaiStack[playerid].Remove(p);
                             break;
                         }
                     }
                     PaiStack[pid].Remove(dapai);
+                    River[pid].Add(dapai);
                     // 收到立直信号
                     if (qm.lizhi)
                     {
@@ -285,28 +286,40 @@ namespace AlphaSoul
                     // 反馈队列
                     List<HuMessage> mlist_hu = new List<HuMessage>();
                     List<ReturnMessage> mlist_fulu = new List<ReturnMessage>();
+                    List<Task> tkList = new List<Task>();
                     foreach (int id in curStatus.playerWind)
                     {
-                        // 发送切牌消息
-                        FuluMessage fmsg = allow_fulu(id, pid, dapai);
-                        ReturnMessage rmsg = (ReturnMessage)player[id].Action("fulu", fmsg);
-                        // 判定优先级 胡>碰>吃
-                        if (rmsg.type == -1)
+                        
+                        Task tk = new Task(() =>
                         {
-                            // 玩家取消
-                            continue;
-                        }
-                        else if (rmsg.type == 1)
-                        {
-                            // 有玩家胡牌
-                            mlist_hu.Add((HuMessage)rmsg);
-                        }
-                        else
-                        {
-                            // 玩家副露
-                            mlist_fulu.Add(rmsg);
-                        }
+                            // 发送切牌消息
+                            Stopwatch swTask = new Stopwatch();
+                            swTask.Start();
+                            FuluMessage fmsg = allow_fulu(id, pid, dapai);
+                            ReturnMessage rmsg = (ReturnMessage)player[id].Action("fulu", fmsg);
+                            // 判定优先级 胡>碰>吃
+                            if (rmsg.type == -1)
+                            {
+                                // 玩家取消
+                                // continue;
+                            }
+                            else if (rmsg.type == 1)
+                            {
+                                // 有玩家胡牌
+                                mlist_hu.Add((HuMessage)rmsg);
+                            }
+                            else
+                            {
+                                // 玩家副露
+                                mlist_fulu.Add(rmsg);
+                            }
+                            swTask.Stop();
+                            Console.WriteLine("Task{0} Cause {1}ms", id, swTask.ElapsedMilliseconds);
+                        });
+                        tkList.Add(tk);
+                        tk.Start();
                     }
+                    Task.WaitAll(tkList.ToArray());
                     // 优先级处理
                     if (mlist_hu.Count > 0)
                     {
@@ -338,10 +351,9 @@ namespace AlphaSoul
                         }
                         else
                         {
-                            // 无人回应 则弃牌进入牌河
-                            River[pid].Add(dapai);
+                            // 无人回应 则正式进入牌河
+                            //River[pid].Add(dapai);
                             dapai.stat = curStatus.zifeng[pid] + 5;
-
                             callback = null;
                         }
 
@@ -474,7 +486,7 @@ namespace AlphaSoul
                 // 合计点数
                 List<Pai> npstack = new List<Pai>(PaiStack[aid]);
                 if (npstack.Count == 13) npstack.Add(hm.tile);
-                PtResult ptr = new PtJudger().Judge(npstack, hm.tile, FuluStack[aid], curStatus.getPlayerParam(aid));
+                PtResult ptr = PtJudger.GetFen(npstack, FuluStack[aid], hm.tile, curStatus.getPlayerParam(aid));
                 serverLog += PaiMaker.GetDisp(npstack)+"\r\n";
                 serverLog += ptr.GetYaku();
                 // 分数加和
@@ -596,7 +608,7 @@ namespace AlphaSoul
             // 判定可能出现的选项
             MopaiMessage msg = new MopaiMessage(mopai);
             // 是否能自摸
-            PtResult ptr = new PtJudger().Judge(plist, mopai, fulu, param);
+            PtResult ptr = PtJudger.GetFen(plist, fulu, mopai, param);
             msg.zimo = ptr.mianzi != null;
             // 是否可以立直
             if(param.lizhi == 0 && fulu.Count == 0)
@@ -633,7 +645,7 @@ namespace AlphaSoul
             PtParam param = curStatus.getPlayerParam(aid);
             List<Pai> np = new List<Pai>(PaiStack[aid]);
             np.Add(mopai);
-            PtResult ptr = new PtJudger().Judge(np, mopai, fulu, param);
+            PtResult ptr = PtJudger.GetFen(np, fulu, mopai, param);
             
             if(ptr.mianzi != null)
             {

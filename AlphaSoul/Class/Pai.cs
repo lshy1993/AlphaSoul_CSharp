@@ -20,6 +20,7 @@ namespace AlphaSoul
         //备用
         public int num { get; set; }
         public char type { get; set; }
+        public char label { get; set; }
         //牌堆状态
         public int stat
         {

@@ -266,7 +266,7 @@ namespace AlphaSoul
         /// <summary>
         /// 状况役种
         /// </summary>
-        private List<Yaku> GetPreYaku(PtParam parm)
+        private static List<Yaku> GetPreYaku(PtParam parm)
         {
             List<Yaku> res = new List<Yaku>();
             if (parm.lizhi == 1) res.Add(new Yaku("立直", 1));
@@ -287,7 +287,7 @@ namespace AlphaSoul
         /// <summary>
         /// 懸賞役
         /// </summary>
-        private List<Yaku> GetPostYaku(Dictionary<char, int[]> shoupai, PtParam param)
+        private static List<Yaku> GetPostYaku(Dictionary<char, int[]> shoupai, PtParam param)
         {
             List<Yaku> res = new List<Yaku>();
             List<string> baopai = param.baopai;
@@ -343,7 +343,7 @@ namespace AlphaSoul
         /// <summary>
         /// 符数计算
         /// </summary>
-        private FuResult GetFu(List<string> mlist, int cf, int zf)
+        private static FuResult GetFu(List<string> mlist, int cf, int zf)
         {
             // 场风
             string changfeng = "^z" + (cf + 1).ToString() + ".*$";
@@ -496,7 +496,7 @@ namespace AlphaSoul
         }
 
         // 役种统计
-        private List<Yaku> GetYaku(List<string> mlist, FuResult fu, List<Yaku> pre)
+        private static List<Yaku> GetYaku(List<string> mlist, FuResult fu, List<Yaku> pre)
         {
             // 初始化役满 (天和、地和)
             List<Yaku> res = (pre.Count > 0 && pre[0].fanshu < 0) ? new List<Yaku>(pre) : new List<Yaku>();
@@ -571,21 +571,21 @@ namespace AlphaSoul
             return res;
         }
 
-        private Yaku guoshiwushuang(List<string> mianzi, FuResult fu)
+        private static Yaku guoshiwushuang(List<string> mianzi, FuResult fu)
         {
             if (mianzi.Count != 13) return null;
             if (fu.danqi) return new Yaku("国士无双十三面", -2);
             return new Yaku("国士无双", -1);
         }
 
-        private Yaku sianke(List<string> mianzi, FuResult fu)
+        private static Yaku sianke(List<string> mianzi, FuResult fu)
         {
             if (fu.n_ankezi != 4) return null;
             if (fu.danqi) return new Yaku("四暗刻单骑", -2);
             return new Yaku("四暗刻", -1);
         }
 
-        private Yaku dasanyuan(List<string> mianzi, FuResult fu)
+        private static Yaku dasanyuan(List<string> mianzi, FuResult fu)
         {
             if (fu.keziz[5] + fu.keziz[6] + fu.keziz[7] == 3)
             {
@@ -609,7 +609,7 @@ namespace AlphaSoul
             return null;
         }
 
-        private Yaku sixihu(List<string> mianzi, FuResult fu)
+        private static Yaku sixihu(List<string> mianzi, FuResult fu)
         {
             if (fu.keziz[1] + fu.keziz[2] + fu.keziz[3] + fu.keziz[4] == 4)
             {
@@ -638,13 +638,13 @@ namespace AlphaSoul
             return null;
         }
 
-        private Yaku ziyise(List<string> mianzi, FuResult fu)
+        private static Yaku ziyise(List<string> mianzi, FuResult fu)
         {
             if (fu.n_zipai == mianzi.Count) return new Yaku("字一色", -1);
             return null;
         }
 
-        private Yaku lvyise(List<string> mianzi, FuResult fu)
+        private static Yaku lvyise(List<string> mianzi, FuResult fu)
         {
             foreach (string mz in mianzi)
             {
@@ -655,20 +655,20 @@ namespace AlphaSoul
             return new Yaku("绿一色", -1);
         }
 
-        private Yaku qinglaotou(List<string> mianzi, FuResult fu)
+        private static Yaku qinglaotou(List<string> mianzi, FuResult fu)
         {
             if (fu.n_kezi == 4 && fu.n_yaojiu == 5 && fu.n_zipai == 0)
                 return new Yaku("清老头", -1);
             return null;
         }
 
-        private Yaku sigangzi(List<string> mianzi, FuResult fu)
+        private static Yaku sigangzi(List<string> mianzi, FuResult fu)
         {
             if (fu.n_gangzi == 4) return new Yaku("四杠子", -1);
             return null;
         }
 
-        private Yaku jiulianbaodeng(List<string> mianzi, FuResult fu)
+        private static Yaku jiulianbaodeng(List<string> mianzi, FuResult fu)
         {
             if (mianzi.Count != 1) return null;
             if (Regex.IsMatch(mianzi[0], "^[mps]1112345678999"))
@@ -682,14 +682,14 @@ namespace AlphaSoul
 
         }
 
-        private Yaku menqianqing(FuResult fu)
+        private static Yaku menqianqing(FuResult fu)
         {
             if (fu.menqing && fu.zimo)
                 return new Yaku("门前清自摸和", 1);
             return null;
         }
 
-        private List<Yaku> yipai(FuResult fu)
+        private static List<Yaku> yipai(FuResult fu)
         {
             string[] fengzi = new string[] { "东", "南", "西", "北" };
             List<Yaku> yipai_all = new List<Yaku>();
@@ -708,19 +708,19 @@ namespace AlphaSoul
             return yipai_all;
         }
 
-        private Yaku pinghu(FuResult fu)
+        private static Yaku pinghu(FuResult fu)
         {
             if (fu.pinghu) return new Yaku("平和", 1);
             return null;
         }
 
-        private Yaku duanyaojiu(FuResult fu)
+        private static Yaku duanyaojiu(FuResult fu)
         {
             if (fu.n_yaojiu == 0) return new Yaku("断幺九", 1);
             return null;
         }
 
-        private Yaku yibeikou(FuResult fu)
+        private static Yaku yibeikou(FuResult fu)
         {
             if (!fu.menqing) return null;
             int beikou = 0;
@@ -743,7 +743,7 @@ namespace AlphaSoul
             return null;
         }
 
-        private Yaku sansetongshun(FuResult fu)
+        private static Yaku sansetongshun(FuResult fu)
         {
             foreach (KeyValuePair<string, int> kv in fu.shunzim)
             {
@@ -755,7 +755,7 @@ namespace AlphaSoul
             return null;
         }
 
-        private Yaku yiqitongguan(FuResult fu)
+        private static Yaku yiqitongguan(FuResult fu)
         {
             if (!fu.shunzim.ContainsKey("123") || !fu.shunzim.ContainsKey("456") || !fu.shunzim.ContainsKey("789")) return null;
             if (fu.shunzim["123"] == 1 && fu.shunzim["456"] == 1 && fu.shunzim["789"] == 1)
@@ -770,38 +770,38 @@ namespace AlphaSoul
             return null;
         }
 
-        private Yaku hunquandaiyaojiu(FuResult fu)
+        private static Yaku hunquandaiyaojiu(FuResult fu)
         {
             if (fu.n_yaojiu == 5 && fu.n_shunzi > 0 && fu.n_zipai > 0)
                 return new Yaku("混全带幺九", fu.menqing ? 2 : 1);
             return null;
         }
 
-        private Yaku qiduizi(List<string> mianzi)
+        private static Yaku qiduizi(List<string> mianzi)
         {
             if (mianzi.Count == 7) return new Yaku("七对子", 2);
             return null;
         }
 
-        private Yaku duiduihu(FuResult fu)
+        private static Yaku duiduihu(FuResult fu)
         {
             if (fu.n_kezi == 4) return new Yaku("对对和", 2);
             return null;
         }
 
-        private Yaku sananke(FuResult fu)
+        private static Yaku sananke(FuResult fu)
         {
             if (fu.n_ankezi == 3) return new Yaku("三暗刻", 2);
             return null;
         }
 
-        private Yaku sangangzi(FuResult fu)
+        private static Yaku sangangzi(FuResult fu)
         {
             if (fu.n_gangzi == 3) return new Yaku("三杠子", 2);
             return null;
         }
 
-        private Yaku sansetongke(FuResult fu)
+        private static Yaku sansetongke(FuResult fu)
         {
             for (int n = 1; n <= 9; n++)
             {
@@ -811,7 +811,7 @@ namespace AlphaSoul
             return null;
         }
 
-        private Yaku hunlaotou(List<string> mianzi, FuResult fu)
+        private static Yaku hunlaotou(List<string> mianzi, FuResult fu)
         {
             if (fu.n_yaojiu == mianzi.Count
                 && fu.n_shunzi == 0 && fu.n_zipai > 0)
@@ -819,7 +819,7 @@ namespace AlphaSoul
             return null;
         }
 
-        private Yaku xiaosanyuan(List<string> mianzi, FuResult fu)
+        private static Yaku xiaosanyuan(List<string> mianzi, FuResult fu)
         {
             if (fu.keziz[5] + fu.keziz[6] + fu.keziz[7] == 2
                 && Regex.IsMatch(mianzi[0], "^z[567]"))
@@ -827,7 +827,7 @@ namespace AlphaSoul
             return null;
         }
 
-        private Yaku hunyise(List<string> mianzi, FuResult fu)
+        private static Yaku hunyise(List<string> mianzi, FuResult fu)
         {
             foreach (string s in new string[] { "m", "p", "s" })
             {
@@ -845,14 +845,14 @@ namespace AlphaSoul
             return null;
         }
 
-        private Yaku chunquandaiyaojiu(FuResult fu)
+        private static Yaku chunquandaiyaojiu(FuResult fu)
         {
             if (fu.n_yaojiu == 5 && fu.n_shunzi > 0 && fu.n_zipai == 0)
                 return new Yaku("纯全带幺九", fu.menqing ? 3 : 2);
             return null;
         }
 
-        private Yaku erbeikou(FuResult fu)
+        private static Yaku erbeikou(FuResult fu)
         {
             if (!fu.menqing) return null;
 
@@ -876,7 +876,7 @@ namespace AlphaSoul
             return null;
         }
 
-        private Yaku qingyise(List<string> mianzi, FuResult fu)
+        private static Yaku qingyise(List<string> mianzi, FuResult fu)
         {
             foreach (string s in new string[] { "m", "p", "s" })
             {

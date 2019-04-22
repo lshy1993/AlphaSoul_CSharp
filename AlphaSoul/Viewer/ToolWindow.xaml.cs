@@ -62,7 +62,7 @@ namespace AlphaSoul
             SetPaiDisp(handStack, mp);
             //胡了形式判定
 
-            PtResult ptr = new PtJudger().Judge(handStack, mp, null, null);
+            PtResult ptr = PtJudger.GetFen(handStack, null, mp, null);
             List<Mianzi> huliaopaixing = ptr.mianziall;
             string str = "";
             foreach (Mianzi mz in huliaopaixing)

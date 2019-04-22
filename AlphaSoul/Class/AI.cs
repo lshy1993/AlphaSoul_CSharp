@@ -393,9 +393,9 @@ namespace AlphaSoul
                         return cb;
                     }
                 }
-                // 默认不副露
-                return new ReturnMessage();
             }
+            // 默认不副露
+            return new ReturnMessage();
         }
 
 
@@ -426,18 +426,19 @@ namespace AlphaSoul
                 }
                 return max;
             }
+            var tingpai = this.fulu_tingpai(handStack, fuluStack);
             // 3向听以内
             if (n_xiangting < 3)
             {
                 // 价值为 进章的得分*枚数    
                 var r = 0;
-                var tingpai = this.fulu_tingpai(handStack, fuluStack);
-                for (var p of tingpai)
+                foreach (var p in tingpai)
                 {
-                    let num = p[0];
-                    let ch = p[1];
+                    var num = p.num;
+                    var ch = p.type;
                     if (paishu[ch][num] == 0) continue;
-                    var new_shoupai = handStack.concat(p + '_');
+                    var new_shoupai = new List<Pai>(handStack);
+                    new_shoupai.Add(p);
                     paishu[ch][num]--;
                     // 继续搜索
                     var ev = this.EvalHand(new_shoupai, fuluStack, paishu);
@@ -450,12 +451,12 @@ namespace AlphaSoul
             {
                 /* 3向聴以前の場合は今までのアルゴリズムで評価 */
                 var r = 0;
-                for (var p of this.fulu_tingpai(handStack, fuluStack))
+                foreach (var p in tingpai)
                 {
-                    let num = p[0];
-                    let ch = p[1];
+                    var num = p.num;
+                    var ch = p.type;
                     if (paishu[ch][num] == 0) continue;
-                    r += paishu[ch][num] * (p[2] == '+' ? 4 : p[2] == '-' ? 2 : 1);
+                    r += paishu[ch][num] * (p.label == '+' ? 4 : p.label == '-' ? 2 : 1);
                 }
                 return r;
             }
@@ -474,37 +475,36 @@ namespace AlphaSoul
                 mopai = fuluStack[fuluStack.Count - 1];
             }
             bool flag = !string.IsNullOrEmpty(mopai) && Regex.IsMatch(mopai, @"\d(?=[\-\+\=])");
-            var n = Convert.ToInt32(Regex.Match(mopai, @"\d(?=[\-\+\=])").ToString());
+            
             // 设置副露吃碰后的禁手
             if (flag)
             {
-                char s = mopai[mopai.Length - 1];
-                if (deny.ContainsKey(s+n.ToString())) deny[s + n.ToString()] = true;
-                else deny.Add(s + n.ToString(), true);
-                if (!Regex.IsMatch(mopai,@"^[mpsz](\d)\1\1.*$"))
+                var match = Regex.Match(mopai, @"\d(?=[\-\+\=])").ToString();
+                int n = Convert.ToInt32(match);
+                char s = mopai[0];
+                string cc = s + n.ToString();
+                if (deny.ContainsKey(cc)) deny[cc] = true;
+                else deny.Add(cc, true);
+                if (!Regex.IsMatch(mopai, @"^[mpsz](\d)\1\1.*$"))
                 {
-                    if (n < 7 && mopai.match(/^[mps]\d\-\d\d$/)) deny[(n + 3) + s] = true;
-                    if (3 < n && mopai.match(/^[mps]\d\d\d\-$/)) deny[(n - 3) + s] = true;
+                    if (n < 7 && Regex.IsMatch(mopai, @"^[mps]\d\-\d\d$"))
+                    {
+                        string cc3 = s + (n + 3).ToString();
+                        if (deny.ContainsKey(cc3)) deny[cc3] = true;
+                        else deny.Add(cc3, true);
+                    }
+                    if (3 < n && Regex.IsMatch(mopai, @"^[mps]\d\d\d\-$")) {
+                        string cc3 = s + (n - 3).ToString();
+                        if (deny.ContainsKey(cc3)) deny[cc3] = true;
+                        else deny.Add(cc3, true);
+                    }
                 }
             }
             var pCount = PaiMaker.GetCount(handStack);
-            foreach (KeyValuePair<char,int[]> kv in pCount)
+            foreach (Pai p in handStack)
             {
-                var bingpai = pCount[s];
-                for (var n = 1; n < bingpai.length; n++)
-                {
-                    if (bingpai[n] == 0) continue;
-                    if (deny[n + s]) continue;
-                    if (n != 5)
-                    {
-                        pai.push(n + s);
-                    }
-                    else
-                    {
-                        if (bingpai[0] > 0) pai.push('0' + s);
-                        if (bingpai[0] < bingpai[5]) pai.push('5' + s);
-                    }
-                }
+                if (deny.ContainsKey(p.code) && deny[p.code]) continue;
+                pai.Add(p);
             }
             return pai;
         }
@@ -527,6 +527,7 @@ namespace AlphaSoul
             param.tianhu = 0;
             // 价值则为胡牌得分
             var hupai = handStack[handStack.Count - 1];
+            hupai.stat = 1;
             var ptrest = PtJudger.GetFen(handStack, fuluStack, hupai, param);
             return ptrest.defen;
         }
